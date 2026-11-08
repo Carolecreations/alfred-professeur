@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Alfred Professeur</title>
+<meta name="theme-color" content="#1d3f9a">
+<meta name="description" content="Votre professeur pour choisir et utiliser les IA gratuites.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Alfred">
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
+<style>
+/* Mise en page : cahier d'écolier à l'encre bleue. Bandeau d'en-tête, onglets, colonne de lecture ~720px ; barre d'onglets en bas sur téléphone. */
+:root{
+  --papier:#f5f7fb;
+  --feuille:#ffffff;
+  --encre:#1d3f9a;
+  --encre-doux:#e3e9f8;
+  --texte:#1c2233;
+  --texte-doux:#5a6378;
+  --trait:#d5dcea;
+  --marge:#c8475a;
+  --vert:#2f7d4f;
+  --vert-doux:#e2f2e8;
+  --ambre:#9a6400;
+  --ambre-doux:#fbf0d9;
+  --rouge-doux:#fbe5e8;
+  --f-titre:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --f-texte:"Atkinson Hyperlegible",Verdana,system-ui,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --papier:#10152a;--feuille:#171e38;--encre:#9db4ff;--encre-doux:#243161;--texte:#e8ebf5;--texte-doux:#a6aec6;--trait:#2c3660;--marge:#f08a98;--vert:#7fd3a0;--vert-doux:#173a29;--ambre:#f0c060;--ambre-doux:#3b2f14;--rouge-doux:#3d1c24;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --papier:#10152a;--feuille:#171e38;--encre:#9db4ff;--encre-doux:#243161;--texte:#e8ebf5;--texte-doux:#a6aec6;--trait:#2c3660;--marge:#f08a98;--vert:#7fd3a0;--vert-doux:#173a29;--ambre:#f0c060;--ambre-doux:#3b2f14;--rouge-doux:#3d1c24;color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--papier);color:var(--texte);font-family:var(--f-texte);font-size:17px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:90px}
+h1,h2,h3{font-family:var(--f-titre);text-wrap:balance;line-height:1.15;margin:0}
+h2{font-size:1.6rem;font-weight:800}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0}
+a{color:var(--encre)}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--encre);outline-offset:2px;border-radius:4px}
+.wrap{max-width:760px;margin:0 auto}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.doux{color:var(--texte-doux)}
+.petit{font-size:.88rem}
+
+/* En-tête */
+header{padding-block:22px 10px}
+.marque{display:flex;gap:14px;align-items:center}
+.marque svg{flex:none}
+.marque h1{font-size:1.9rem;font-weight:800;color:var(--encre);letter-spacing:-.01em}
+.marque p{font-size:.95rem;color:var(--texte-doux)}
+
+/* Onglets */
+nav.onglets{display:flex;gap:6px;margin-block:14px 22px;border-bottom:2px solid var(--trait);overflow-x:auto}
+nav.onglets a{padding:10px 14px;text-decoration:none;color:var(--texte-doux);font-weight:700;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav.onglets a[aria-current="page"]{color:var(--encre);border-color:var(--encre)}
+@media (max-width:640px){
+  nav.onglets{position:fixed;left:0;right:0;bottom:0;z-index:20;margin:0;background:var(--feuille);border-top:1px solid var(--trait);border-bottom:0;justify-content:space-around;padding:4px max(6px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px));gap:0}
+  nav.onglets a{flex:1;display:flex;flex-direction:column;align-items:center;font-size:.72rem;padding:6px 2px;border:0;margin:0;gap:2px}
+  nav.onglets a[aria-current="page"]{background:var(--encre-doux);border-radius:8px}
+  nav.onglets .ic{display:block}
+}
+nav.onglets .ic{display:none;width:22px;height:22px}
+
+/* Feuille de cahier */
+.feuille{background:var(--feuille);border:1px solid var(--trait);border-radius:var(--r);padding:20px;position:relative}
+.feuille.cahier{padding-left:34px;background-image:linear-gradient(90deg,transparent 22px,var(--marge) 22px,var(--marge) 23.5px,transparent 23.5px)}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--encre)}
+
+.btn{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--encre);background:var(--encre);color:var(--feuille);padding:10px 18px;border-radius:999px;font-weight:700;cursor:pointer;text-decoration:none;min-height:46px}
+.btn.sec{background:transparent;color:var(--encre)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chip{border:1.5px solid var(--trait);background:var(--feuille);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:700;color:var(--texte-doux)}
+.chip[aria-pressed="true"]{border-color:var(--encre);background:var(--encre-doux);color:var(--encre)}
+.pastille{display:inline-block;font-size:.78rem;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--encre-doux);color:var(--encre)}
+.pastille.vert{background:var(--vert-doux);color:var(--vert)}
+.pastille.ambre{background:var(--ambre-doux);color:var(--ambre)}
+.pastille.rouge{background:var(--rouge-doux);color:var(--marge)}
+
+/* Accueil */
+.portes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.porte{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--texte);background:var(--feuille);border:1px solid var(--trait);border-radius:var(--r);padding:18px;transition:border-color .15s,transform .15s}
+.porte:hover{border-color:var(--encre);transform:translateY(-2px)}
+.porte strong{font-family:var(--f-titre);font-size:1.15rem;color:var(--encre)}
+.principe{font-family:var(--f-titre);font-size:1.25rem;font-weight:500;line-height:1.35}
+
+/* Guide */
+.fiches{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+@media (max-width:400px){.fiches{grid-template-columns:1fr}}
+.fiche{background:var(--feuille);border:1px solid var(--trait);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.fiche-tete{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.note{font-family:var(--f-titre);font-weight:800;font-size:1.3rem;color:var(--encre);white-space:nowrap}
+.note small{font-size:.75rem;color:var(--texte-doux);font-weight:500}
+.cases{display:flex;flex-wrap:wrap;gap:4px}
+.case{font-size:.76rem;padding:1px 8px;border-radius:4px;border:1px solid var(--trait);color:var(--texte-doux)}
+.case.oui{border-color:var(--encre);color:var(--encre);font-weight:700}
+details summary{cursor:pointer;font-weight:700;color:var(--encre)}
+dl.infos{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:10px 0 0;font-size:.92rem}
+dl.infos dt{color:var(--texte-doux)}
+dl.infos dd{margin:0}
+@media (max-width:560px){dl.infos{grid-template-columns:1fr;gap:2px}dl.infos dd{margin-bottom:8px}}
+
+/* Orienter */
+textarea{width:100%;min-height:96px;border:1.5px solid var(--trait);border-radius:var(--r);padding:12px;background:var(--papier);resize:vertical}
+.idees{display:flex;flex-wrap:wrap;gap:8px}
+.idees .chip{font-size:.85rem;padding:5px 12px;text-align:left}
+.coche{display:flex;gap:10px;align-items:flex-start}
+.coche input{width:20px;height:20px;margin-top:3px;flex:none}
+.reco{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
+.rang{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-titre);font-weight:800;font-size:1.3rem;background:var(--encre-doux);color:var(--encre)}
+.reco:first-child .rang{background:var(--encre);color:var(--feuille)}
+.jauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 14px;font-size:.88rem}
+.demande{white-space:pre-wrap;background:var(--papier);border:1px dashed var(--encre);border-radius:var(--r);padding:14px;font-size:.95rem}
+.alerte{background:var(--ambre-doux);color:var(--texte);border-radius:var(--r);padding:12px 14px;border-left:4px solid var(--ambre)}
+
+/* Parcours */
+.lecons{display:flex;flex-direction:column;gap:10px}
+.lecon-lien{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;background:var(--feuille);border:1px solid var(--trait);border-radius:var(--r);padding:14px;text-decoration:none;color:var(--texte)}
+.lecon-lien:hover{border-color:var(--encre)}
+.num{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-family:var(--f-titre);font-weight:800;font-size:1.3rem;border:2px solid var(--encre);color:var(--encre)}
+.fait .num{background:var(--vert);border-color:var(--vert);color:var(--feuille)}
+.etapes{display:flex;gap:4px;flex-wrap:wrap}
+.etape{flex:1;min-width:80px;text-align:center;font-size:.75rem;font-weight:700;padding:6px 4px;border-radius:6px;background:var(--papier);color:var(--texte-doux);border:1px solid var(--trait);cursor:pointer}
+.etape.active{background:var(--encre);color:var(--feuille);border-color:var(--encre)}
+.etape.vue{color:var(--encre);border-color:var(--encre)}
+.quiz fieldset{border:0;padding:0;margin:0 0 16px;display:flex;flex-direction:column;gap:6px}
+.quiz legend{font-weight:700;margin-bottom:6px}
+.quiz label{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1.5px solid var(--trait);border-radius:8px;cursor:pointer}
+.quiz label.bon{border-color:var(--vert);background:var(--vert-doux)}
+.quiz label.faux{border-color:var(--marge);background:var(--rouge-doux)}
+.quiz .expl{font-size:.9rem;color:var(--texte-doux)}
+select{border:1.5px solid var(--trait);border-radius:8px;padding:8px 10px;background:var(--feuille)}
+
+/* Progression */
+.chiffres{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.chiffre{background:var(--feuille);border:1px solid var(--trait);border-radius:var(--r);padding:14px}
+.chiffre b{display:block;font-family:var(--f-titre);font-size:2rem;color:var(--encre);font-variant-numeric:tabular-nums}
+.barre{height:12px;border-radius:999px;background:var(--encre-doux);overflow:hidden}
+.barre i{display:block;height:100%;background:var(--encre);border-radius:999px;transition:width .4s}
+.niveaux{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.niveaux li{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;border:1px solid var(--trait);background:var(--feuille)}
+.niveaux li.ici{border-color:var(--encre);background:var(--encre-doux)}
+.niveaux li .n{font-family:var(--f-titre);font-weight:800;color:var(--encre);text-align:center}
+.competences{display:flex;flex-wrap:wrap;gap:8px}
+.comp{padding:6px 12px;border-radius:8px;border:1.5px dashed var(--trait);color:var(--texte-doux);font-size:.9rem}
+.comp.ok{border-style:solid;border-color:var(--vert);color:var(--vert);background:var(--vert-doux);font-weight:700}
+
+.garde{border:1.5px solid var(--marge);border-radius:var(--r);padding:12px 14px;background:var(--rouge-doux);font-size:.92rem}
+.citation{font-family:var(--f-titre);font-size:1.35rem;font-weight:500;line-height:1.35;color:var(--encre)}
+.citation-auteur{font-size:.88rem;color:var(--texte-doux)}
+.outils{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.outil{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--texte);background:var(--feuille);border:1px solid var(--trait);border-radius:var(--r);padding:16px}
+.outil:hover{border-color:var(--encre)}
+.outil strong{font-family:var(--f-titre);color:var(--encre);font-size:1.08rem}
+.question{display:flex;flex-direction:column;gap:6px}
+.question label{font-weight:700}
+.question textarea{min-height:70px}
+.balance{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.balance{grid-template-columns:1fr}}
+.balance ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.balance li{display:flex;justify-content:space-between;gap:8px;padding:6px 10px;border:1px solid var(--trait);border-radius:8px;background:var(--papier)}
+.balance li span{min-width:0;overflow-wrap:anywhere}
+.ajout{display:flex;gap:6px;flex-wrap:wrap}
+.ajout input{flex:1;min-width:140px;border:1.5px solid var(--trait);border-radius:8px;padding:8px 10px;background:var(--papier)}
+.mini{border:0;background:none;color:var(--texte-doux);cursor:pointer;font-size:1rem}
+.crise{border:2px solid var(--marge);border-radius:var(--r);background:var(--feuille);padding:20px}
+.numeros{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:1rem}
+.numeros b{font-family:var(--f-titre);font-size:1.25rem;color:var(--marge);user-select:all}
+.domaine{padding:0}
+.domaine summary{padding:14px 16px;list-style-position:outside;margin-left:18px}
+.domaine summary strong{font-family:var(--f-titre);color:var(--encre);font-size:1.05rem}
+.idees-liste{display:flex;flex-direction:column;border-top:1px solid var(--trait)}
+.idee{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--trait)}
+.idee:last-child{border-bottom:0}
+@media (max-width:560px){.idee{grid-template-columns:1fr}.idee .btn{justify-self:start}}
+footer{margin-top:36px;padding-block:18px;border-top:1px solid var(--trait);font-size:.86rem;color:var(--texte-doux)}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--texte);color:var(--papier);padding:10px 18px;border-radius:999px;font-weight:700;z-index:30}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+<header>
+  <div class="marque">
+    <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true">
+      <circle cx="28" cy="28" r="27" fill="var(--encre-doux)"/>
+      <path d="M8 22 L28 13 L48 22 L28 31 Z" fill="var(--encre)"/>
+      <path d="M17 26 v8 c0 4 22 4 22 0 v-8 l-11 5 z" fill="var(--encre)" opacity=".75"/>
+      <path d="M46 23 v9" stroke="var(--marge)" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M18 40 v8 L26 44 z M38 40 v8 L30 44 z" fill="var(--marge)"/>
+      <circle cx="28" cy="44" r="2.6" fill="var(--marge)"/>
+    </svg>
+    <div>
+      <h1>Alfred Professeur</h1>
+      <p>Votre professeur pour choisir et utiliser les IA gratuites</p>
+    </div>
+  </div>
+</header>
+
+<nav class="onglets" aria-label="Rubriques">
+  <a href="#accueil" data-v="accueil"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9H3z"/></svg>Accueil</a>
+  <a href="#guide" data-v="guide"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Guide des IA</a>
+  <a href="#orienter" data-v="orienter"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 4-4 2 2-4z"/></svg>Quelle IA ?</a>
+  <a href="#parcours" data-v="parcours"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg>Leçons</a>
+  <a href="#reflechir" data-v="reflechir"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0-3.5 10.9V17h7v-3.1A6 6 0 0 0 12 3z"/><path d="M9.5 21h5"/></svg>Réfléchir</a>
+  <a href="#progression" data-v="progression"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progrès</a>
+</nav>
+
+<main id="vue"></main>
+
+<footer class="stack">
+  <p><strong>Alfred vous apprend à utiliser les IA, il ne répond pas à votre place.</strong> Il n'est ni médecin, ni psychologue, ni avocat, ni conseiller financier. En cas de détresse, appelez le 3114 (prévention du suicide, gratuit, 24 h/24) ou le 15.</p>
+  <p>Ne donnez jamais à une IA vos mots de passe, numéros de carte bancaire ou de sécurité sociale. Les offres gratuites changent souvent : chaque fiche porte sa date de vérification. Votre progression reste sur cet appareil.</p>
+</footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+var MAJ = "novembre 2026";
+
+/* ---------- Les IA ---------- */
+var IA = [
+ {id:"chatgpt",nom:"ChatGPT",par:"OpenAI",origine:"États-Unis",zone:"us",site:"https://chatgpt.com/",q:"https://chatgpt.com/?q=",
+  cat:["texte","image","code"],note:9,
+  forts:"Très polyvalent, explique bien, écrit des courriers clairs, lit les photos et les PDF.",
+  faibles:"Peut inventer des faits avec assurance. La version gratuite passe sur un modèle plus simple quand on a beaucoup écrit.",
+  gratuit:"Oui, avec un compte gratuit. Nombre de messages avec le meilleur modèle limité par jour.",
+  confid:"Serveurs aux États-Unis. Dans les réglages, on peut refuser que ses échanges servent à l'entraînement.",conf:2},
+ {id:"copilot",nom:"Copilot",par:"Microsoft",origine:"États-Unis",zone:"us",site:"https://copilot.microsoft.com/",
+  cat:["texte","image","code"],note:8,
+  forts:"Déjà présent dans Windows 11 et Edge. Cherche sur le web et donne ses sources. Crée des images.",
+  faibles:"Réponses parfois courtes. Pousse à utiliser les produits Microsoft.",
+  gratuit:"Oui, avec un compte Microsoft. Images en nombre limité par jour.",
+  confid:"Serveurs aux États-Unis et en Europe. Lié à votre compte Microsoft.",conf:2},
+ {id:"gemini",nom:"Gemini",par:"Google",origine:"États-Unis",zone:"us",site:"https://gemini.google.com/",
+  cat:["texte","image","code","video"],note:8,
+  forts:"Relié à Gmail, Agenda, Drive et Maps si vous le souhaitez. Bon pour les voyages et les informations récentes.",
+  faibles:"Les échanges peuvent être relus par des personnes chez Google si l'historique est activé.",
+  gratuit:"Oui, avec un compte Google. Fonctions avancées limitées.",
+  confid:"Serveurs Google. Désactiver « Activité dans les applis Gemini » pour plus de discrétion.",conf:2},
+ {id:"claude",nom:"Claude",par:"Anthropic",origine:"États-Unis",zone:"us",site:"https://claude.ai/",q:"https://claude.ai/new?q=",
+  cat:["texte","code"],note:9,
+  forts:"Excellent pour écrire, relire, résumer de longs documents et créer des applications. Ton nuancé.",
+  faibles:"Pas d'images créées. Quota gratuit atteint assez vite lors de longues séances.",
+  gratuit:"Oui, avec un compte gratuit. Le quota se recharge toutes les quelques heures.",
+  confid:"Serveurs aux États-Unis. Réglage disponible pour refuser l'entraînement sur vos échanges.",conf:2},
+ {id:"lechat",nom:"Le Chat",par:"Mistral AI",origine:"France",zone:"eu",site:"https://chat.mistral.ai/",
+  cat:["texte","image","code"],note:8,
+  forts:"IA française, soumise au droit européen. Rapide, bon en français, crée aussi des images. Le modèle Codestral aide pour le code.",
+  faibles:"Un peu moins fort que les meilleurs sur les raisonnements longs.",
+  gratuit:"Oui, avec un compte gratuit, généreux pour un usage courant.",
+  confid:"Entreprise française, règles européennes (RGPD). Le meilleur choix pour vos papiers personnels.",conf:3},
+ {id:"perplexity",nom:"Perplexity",par:"Perplexity AI",origine:"États-Unis",zone:"us",site:"https://www.perplexity.ai/",q:"https://www.perplexity.ai/search?q=",
+  cat:["texte"],note:8,
+  forts:"Un moteur de recherche qui répond en phrases et cite chaque source. Idéal pour vérifier une information.",
+  faibles:"Moins bon pour écrire un long texte ou un courrier.",
+  gratuit:"Oui, même sans compte. Recherches approfondies limitées par jour.",
+  confid:"Serveurs aux États-Unis.",conf:2},
+ {id:"deepseek",nom:"DeepSeek",par:"DeepSeek",origine:"Chine",zone:"cn",site:"https://chat.deepseek.com/",
+  cat:["texte","code"],note:7,
+  forts:"Très fort en raisonnement, en mathématiques et en code. Gratuit et généreux.",
+  faibles:"Évite certains sujets politiques. Parfois saturé.",
+  gratuit:"Oui, avec un compte gratuit.",
+  confid:"Données stockées en Chine. Ne jamais y mettre d'informations personnelles.",conf:1},
+ {id:"qwen",nom:"Qwen",par:"Alibaba",origine:"Chine",zone:"cn",site:"https://chat.qwen.ai/",
+  cat:["texte","code","image"],note:7,
+  forts:"Bon en code et en langues, crée aussi des images.",
+  faibles:"Interface surtout en anglais. Évite certains sujets.",
+  gratuit:"Oui, avec un compte gratuit.",
+  confid:"Entreprise chinoise. Aucune information personnelle.",conf:1},
+ {id:"kimi",nom:"Kimi",par:"Moonshot AI",origine:"Chine",zone:"cn",site:"https://www.kimi.com/",
+  cat:["texte","code"],note:6,
+  forts:"Lit de très longs documents d'un coup.",
+  faibles:"Moins connu en France, interface en anglais.",
+  gratuit:"Oui, avec un compte gratuit.",
+  confid:"Entreprise chinoise. Aucune information personnelle.",conf:1},
+ {id:"firefly",nom:"Firefly",par:"Adobe",origine:"États-Unis",zone:"us",site:"https://firefly.adobe.com/",
+  cat:["image","video"],note:7,
+  forts:"Images de belle qualité, entraîné sur des images sous licence : plus sûr pour un usage commercial.",
+  faibles:"Peu de crédits gratuits par mois.",
+  gratuit:"Oui, avec un compte Adobe gratuit, crédits mensuels limités.",
+  confid:"Serveurs Adobe.",conf:2},
+ {id:"leonardo",nom:"Leonardo",par:"Leonardo.Ai (Canva)",origine:"Australie",zone:"autre",site:"https://leonardo.ai/",
+  cat:["image","video"],note:7,
+  forts:"Beaucoup de styles (aquarelle, BD, photo). Bon pour illustrations et cartes.",
+  faibles:"Interface en anglais, réglages nombreux pour un débutant.",
+  gratuit:"Oui, crédits gratuits rechargés chaque jour.",
+  confid:"Images gratuites visibles publiquement.",conf:2},
+ {id:"suno",nom:"Suno",par:"Suno",origine:"États-Unis",zone:"us",site:"https://suno.com/",
+  cat:["audio"],note:8,
+  forts:"Crée une chanson complète (musique + voix) à partir d'une idée ou de vos paroles.",
+  faibles:"Usage commercial interdit avec l'offre gratuite.",
+  gratuit:"Oui, quelques chansons par jour.",
+  confid:"Chansons gratuites parfois publiques.",conf:2},
+ {id:"udio",nom:"Udio",par:"Udio",origine:"États-Unis",zone:"us",site:"https://www.udio.com/",
+  cat:["audio"],note:6,
+  forts:"Musique de qualité, nombreux styles.",
+  faibles:"Conditions changées plusieurs fois, téléchargements parfois limités.",
+  gratuit:"Offre gratuite limitée, à vérifier avant usage.",
+  confid:"Serveurs aux États-Unis.",conf:2}
+];
+var byId={}; IA.forEach(function(a){byId[a.id]=a});
+var CATS={texte:"Texte",code:"Code",image:"Image",audio:"Audio",video:"Vidéo"};
+
+/* ---------- Moteur d'orientation ---------- */
+var BESOINS=[
+ {id:"courrier",titre:"Écrire un courrier ou un e-mail",re:/courrier|lettre|mail|réclam|résili|administr|formulaire|plainte|banque|impôt|caf|mairie|assurance/i,
+  ia:[["lechat","Bon en français et européen : vos coordonnées restent sous le droit européen."],["claude","Ton juste et poli, propose facilement deux versions."],["chatgpt","Très clair, peut lire la photo d'un courrier reçu."]],
+  temps:"5 min",cplx:"Facile",lecon:2,
+  modele:"Tu es un assistant qui m'aide à écrire un courrier.\nVoici ma situation : {besoin}\nÉcris un courrier poli, clair et court, avec l'objet, la formule de politesse et la place pour mes coordonnées (laisse [NOM] et [ADRESSE] à remplir).\nPuis propose une deuxième version plus ferme."},
+ {id:"appli",titre:"Créer une application ou un site",re:/appli|application|site|code|programm|react|html|javascript|python|macro|formule excel/i,
+  ia:[["claude","Le plus fiable pour créer une petite application qui fonctionne du premier coup."],["deepseek","Très fort en code et gratuit (sans données personnelles)."],["qwen","Autre bon choix gratuit pour le code."]],
+  temps:"30 min à 2 h",cplx:"Moyen",lecon:5,
+  modele:"Je suis débutant(e) en informatique.\nJe veux créer : {besoin}\nExplique-moi étape par étape, avec des mots simples. Donne-moi le code complet dans un seul fichier, et dis-moi exactement où le coller et comment l'ouvrir."},
+ {id:"image",titre:"Créer une image",re:/image|dessin|illustr|logo|affiche|carte d'anniv|carte de vœux|faire-part|peinture|aquarelle/i,
+  ia:[["copilot","Gratuit avec un compte Microsoft, très simple : on décrit, il dessine."],["lechat","Crée des images directement dans la conversation, en français."],["leonardo","Beaucoup de styles artistiques au choix."]],
+  temps:"5 min",cplx:"Facile",lecon:5,
+  modele:"Crée une image : {besoin}\nStyle : chaleureux et lumineux. Format carré. Pas de texte dans l'image."},
+ {id:"musique",titre:"Créer une chanson ou une musique",re:/musique|chanson|mélodie|jingle|berceuse|refrain/i,
+  ia:[["suno","Crée une chanson complète avec voix en une minute."],["udio","Autre bon choix, nombreux styles."],["chatgpt","Pour écrire d'abord les paroles, puis les coller dans Suno."]],
+  temps:"10 min",cplx:"Facile",lecon:5,
+  modele:"Écris les paroles d'une chanson en français : {besoin}\nDeux couplets et un refrain, phrases courtes et faciles à chanter. Indique aussi un style musical en anglais (exemple : acoustic folk, warm female voice)."},
+ {id:"recherche",titre:"Chercher ou vérifier une information",re:/actualit|récent|horaire|prix|compar|source|vérifi|cherch|trouv|vrai|rumeur|meilleur/i,
+  ia:[["perplexity","Cite chaque source : on peut vérifier d'un clic."],["copilot","Cherche sur le web et donne les liens."],["gemini","Bien relié à Google Recherche et Maps."]],
+  temps:"2 min",cplx:"Facile",lecon:4,
+  modele:"{besoin}\nRéponds en français, avec des phrases simples, et donne les sources (sites officiels de préférence). Dis-moi si l'information est incertaine."},
+ {id:"resumer",titre:"Résumer ou comprendre un document",re:/résum|pdf|document|contrat|notice|comprendre un|ordonnance|relevé|long texte/i,
+  ia:[["lechat","Européen : plus prudent pour vos papiers."],["claude","Excellent pour les longs documents et les explications claires."],["chatgpt","Lit aussi les photos de documents."]],
+  temps:"3 min",cplx:"Facile",lecon:1,
+  modele:"Je vais te donner un document. {besoin}\nRésume-le en 5 points simples, puis dis-moi ce que je dois faire concrètement et avant quelle date. Si un mot est technique, explique-le."},
+ {id:"apprendre",titre:"Apprendre ou se faire expliquer",re:/apprendre|langue|anglais|espagnol|italien|expliqu|cours|histoire|comment marche|réviser/i,
+  ia:[["chatgpt","Patient, adapte ses explications, peut faire réviser par questions."],["claude","Explications nuancées et bien construites."],["gemini","Ajoute des liens et des vidéos utiles."]],
+  temps:"15 min",cplx:"Facile",lecon:5,
+  modele:"Je veux apprendre : {besoin}\nExplique-moi comme à un débutant, avec un exemple de la vie quotidienne. Ensuite pose-moi 3 questions pour vérifier que j'ai compris, une à la fois, et attends ma réponse."},
+ {id:"voyage",titre:"Préparer un voyage",re:/voyage|vacances|itinéraire|séjour|visite|week-end|road trip|valise/i,
+  ia:[["gemini","Relié à Google Maps, bon pour les trajets et horaires."],["perplexity","Vérifie les infos pratiques avec les sources."],["chatgpt","Construit un programme jour par jour."]],
+  temps:"20 min",cplx:"Facile",lecon:4,
+  modele:"Aide-moi à préparer ce voyage : {besoin}\nPropose un programme jour par jour, rythme tranquille, avec un budget approximatif et les formalités à vérifier. Signale ce que je dois confirmer sur un site officiel."},
+ {id:"organiser",titre:"Organiser, budget, menus",re:/budget|dépense|économ|planning|agenda|organis|liste|tâche|menu|repas|courses|semaine|rangement/i,
+  ia:[["chatgpt","Fait de beaux tableaux et des listes claires."],["lechat","Européen et rapide pour les listes du quotidien."],["claude","Bon pour réfléchir à un vrai plan."]],
+  temps:"10 min",cplx:"Facile",lecon:3,
+  modele:"Aide-moi à m'organiser : {besoin}\nPose-moi d'abord 3 questions pour bien comprendre ma situation. Ensuite propose un plan simple sous forme de tableau."}
+];
+var GENERAL={id:"general",titre:"Besoin général",ia:[["chatgpt","Le plus polyvalent pour commencer."],["lechat","Européen, bon en français."],["claude","Très bon pour écrire et réfléchir."]],temps:"5 min",cplx:"Facile",lecon:1,
+  modele:"{besoin}\nRéponds en français avec des mots simples. Si tu as besoin de précisions, pose-moi d'abord des questions."};
+var PROF="Agis comme un professeur de philosophie d'université, bienveillant et exigeant, qui parle simplement.\nUtilise la méthode de Socrate : ne me donne pas ta réponse. Pose-moi une seule question à la fois, attends ma réponse, puis aide-moi à préciser mes mots, à repérer mes présupposés et mes contradictions, et à envisager le point de vue contraire.\nQuand c'est utile, cite un philosophe (Socrate, Épictète, Sénèque, Montaigne, Descartes, Pascal, Spinoza, Kant…) et explique sa pensée en deux phrases, sans jargon.\nÀ la fin, résume en 3 points ce que j'ai clarifié.\nTu n'es ni psychologue, ni médecin, ni avocat : si je parle de détresse, de violence ou d'idées de mort, arrête l'exercice et conseille-moi d'appeler le 3114 ou une personne de confiance.\n\nMon sujet : ";
+var IDEES=["Écrire à ma banque pour contester des frais","Créer une carte d'anniversaire pour ma petite-fille","Comprendre une lettre des impôts","Préparer 4 jours à Lisbonne en mai","Faire mes menus de la semaine","Créer une application pour noter mes recettes"];
+
+/* ---------- Parcours ---------- */
+var COMP=[
+ ["Savoir ce qu'est une IA","Repérer quand l'IA se trompe"],
+ ["Faire rédiger un courrier","Demander une autre version"],
+ ["Donner du contexte à l'IA","Obtenir un plan ou un tableau"],
+ ["Préparer un voyage avec l'IA","Faire vérifier une information"],
+ ["Se faire expliquer un sujet","Créer une image"],
+ ["Réfléchir avec l'IA par questions","Repérer un argument trompeur"]
+];
+var LECONS=[
+ {t:"Comprendre ce qu'est une IA",ia:"chatgpt",
+  comprendre:"Une IA comme ChatGPT ou Le Chat a lu une énorme quantité de textes. Quand vous lui écrivez, elle devine la suite la plus probable, un peu comme un très bon élève qui aurait tout lu. Elle ne « sait » pas vraiment : elle peut donc se tromper avec beaucoup d'assurance. Elle est excellente pour écrire, résumer, expliquer et proposer des idées. Elle est moins fiable pour les chiffres précis, les dates récentes et les informations sur des personnes.",
+  observer:{q:"Quelles sont les 3 choses qu'une IA fait bien, et les 3 erreurs qu'elle fait souvent ? Réponds simplement.",r:"Une IA fait bien : rédiger un texte, résumer un document, expliquer un sujet.\nErreurs fréquentes : inventer une source, se tromper sur une date récente, faire une erreur de calcul."},
+  pratiquer:"Explique-moi en 5 phrases simples ce qu'est une intelligence artificielle, puis donne-moi un exemple où je ne devrais pas te faire confiance.",
+  quiz:[["Une IA peut-elle se tromper ?",["Non, elle a tout lu","Oui, même avec assurance","Seulement en anglais"],1,"Elle devine la réponse la plus probable : elle peut inventer."],
+        ["Pour une date d'ouverture de mairie, que faire ?",["Croire l'IA","Vérifier sur le site officiel","Demander deux fois"],1,"Pour les infos pratiques, le site officiel fait foi."],
+        ["Que ne faut-il jamais donner à une IA ?",["Son prénom","Ses mots de passe","Une recette"],1,"Mots de passe, carte bancaire et numéro de sécurité sociale restent chez vous."]],
+  appliquer:"Cette semaine, posez une question de votre quotidien à une IA, puis vérifiez la réponse ailleurs."},
+ {t:"Écrire un courrier avec l'IA",ia:"lechat",
+  comprendre:"L'IA est très forte pour les courriers administratifs : résiliation, réclamation, demande de remboursement. Le secret est de lui donner la situation, le destinataire et le ton voulu. Vous gardez vos vraies coordonnées pour la fin : laissez [NOM] et [ADRESSE] et remplissez-les vous-même.",
+  observer:{q:"Écris un courrier pour résilier mon abonnement de salle de sport, contrat n° [NUMÉRO], car je déménage. Ton poli.",r:"Objet : Résiliation de mon abonnement – contrat n° [NUMÉRO]\n\nMadame, Monsieur,\nJe vous informe de ma décision de résilier mon abonnement, en raison de mon déménagement…\n(l'IA propose ensuite la formule de politesse et la place pour la signature)"},
+  pratiquer:"Je dois écrire à mon fournisseur d'électricité car ma facture est deux fois plus élevée que d'habitude. Écris un courrier poli et clair, laisse [NOM], [ADRESSE] et [NUMÉRO CLIENT] à remplir. Puis propose une deuxième version plus ferme.",
+  quiz:[["Que mettre dans votre demande ?",["Juste « fais un courrier »","La situation, le destinataire et le ton","Votre numéro de carte"],1,"Plus l'IA a de contexte, meilleur est le courrier."],
+        ["Le courrier ne vous plaît pas. Que faire ?",["Tout recommencer","Demander « plus court » ou « plus ferme »","Abandonner"],1,"On peut toujours demander une autre version."],
+        ["Vos coordonnées réelles…",["Je les remplis moi-même à la fin","Je les donne à l'IA","Je les invente"],0,"Laissez des cases à remplir : c'est plus prudent."]],
+  appliquer:"Pensez à un courrier que vous repoussez depuis longtemps et écrivez-le avec l'IA."},
+ {t:"S'organiser : menus, budget, planning",ia:"chatgpt",
+  comprendre:"L'IA peut transformer une liste en désordre en un plan clair. Donnez-lui votre situation (nombre de personnes, budget, contraintes) et demandez un tableau. Une astuce très utile : lui demander de vous poser des questions avant de répondre.",
+  observer:{q:"Fais-moi les menus du soir de la semaine pour 2 personnes, budget 50 €, sans poisson. Pose-moi d'abord 2 questions.",r:"Avant de commencer : 1. Avez-vous des légumes que vous aimez particulièrement ? 2. Combien de temps voulez-vous passer en cuisine ?\n(puis un tableau Lundi → Dimanche avec la liste de courses)"},
+  pratiquer:"Aide-moi à organiser ma semaine prochaine. Pose-moi d'abord 3 questions sur mes rendez-vous et mes envies, puis propose un planning sous forme de tableau.",
+  quiz:[["Pourquoi demander à l'IA de poser des questions ?",["Pour gagner du temps plus tard","Pour la fatiguer","Ça ne sert à rien"],0,"Elle comprend mieux votre situation et répond juste du premier coup."],
+        ["Pour lire facilement un plan, on demande…",["Un poème","Un tableau ou une liste","Une image"],1,"Les tableaux rendent un plan lisible en un coup d'œil."],
+        ["L'IA donne un budget précis. On…",["Le vérifie avec ses vrais prix","Le croit sans regarder","L'ignore"],0,"Les prix varient : vérifiez avec vos tickets."]],
+  appliquer:"Faites vos menus ou votre planning de la semaine prochaine avec l'IA."},
+ {t:"Préparer un voyage et vérifier",ia:"perplexity",
+  comprendre:"Pour un voyage, l'IA propose un programme jour par jour en quelques secondes. Mais les horaires, prix et formalités changent : utilisez une IA qui cite ses sources, comme Perplexity, et vérifiez sur les sites officiels (France Diplomatie pour les papiers).",
+  observer:{q:"Quels papiers faut-il pour aller au Maroc depuis la France ? Donne tes sources.",r:"Pour un séjour touristique, un passeport valide est demandé…\nSources : diplomatie.gouv.fr, site de l'ambassade.\n(chaque phrase renvoie vers un site que vous pouvez ouvrir)"},
+  pratiquer:"Propose-moi un séjour de 3 jours tranquille dans une ville d'Europe en train depuis la France, avec un budget approximatif. Donne les sources des informations pratiques.",
+  quiz:[["Quelle IA cite ses sources ?",["Perplexity","Suno","Leonardo"],0,"Perplexity met un lien sous chaque information."],
+        ["Les formalités de voyage, on les confirme…",["Sur un forum","Sur le site officiel du gouvernement","Pas besoin"],1,"France Diplomatie fait foi."],
+        ["Le programme proposé est trop chargé. On…",["Demande un rythme plus tranquille","Part quand même","Change d'IA"],0,"Dites-lui simplement ce que vous voulez changer."]],
+  appliquer:"Choisissez une sortie ou un voyage rêvé et préparez-le avec une IA qui cite ses sources."},
+ {t:"Apprendre et créer",ia:"copilot",
+  comprendre:"L'IA est un professeur patient : elle peut expliquer un sujet, vous faire réviser par questions, ou vous aider à créer une image, une carte, une chanson. Pour une image, décrivez ce que vous voulez voir, le style (aquarelle, photo, dessin) et l'ambiance.",
+  observer:{q:"Crée l'image d'une carte d'anniversaire : un chat roux qui souffle 8 bougies, style aquarelle, couleurs douces.",r:"(Copilot affiche 1 à 4 images. Vous choisissez celle qui vous plaît, ou demandez « plus de bleu », « sans texte »…)"},
+  pratiquer:"Crée l'image d'une carte de vœux : un jardin au printemps avec un banc et des fleurs, style aquarelle, couleurs douces, sans texte.",
+  quiz:[["Pour une belle image, on décrit…",["Le sujet, le style et l'ambiance","Un seul mot","Son adresse"],0,"Plus la description est précise, plus l'image ressemble à votre idée."],
+        ["Pour apprendre, on peut demander à l'IA…",["De poser des questions pour vérifier","De faire nos devoirs à notre place","Rien"],0,"Se faire interroger aide à retenir."],
+        ["Une image gratuite de Leonardo peut être…",["Visible publiquement","Toujours privée","Vendue par moi sans règle"],0,"Lisez les conditions avant un usage commercial."]],
+  appliquer:"Créez une image pour quelqu'un que vous aimez, ou apprenez un sujet qui vous intrigue."},
+ {t:"Penser avec l'IA, pas à sa place",ia:"claude",
+  comprendre:"Un bon professeur de philosophie ne donne pas la réponse : il pose des questions pour que vous la trouviez vous-même. C'est la méthode de Socrate. Vous pouvez demander la même chose à une IA : au lieu de « dis-moi quoi faire », demandez-lui de vous interroger. Gardez aussi votre esprit critique : une IA peut construire un raisonnement qui sonne juste mais repose sur une erreur ou un argument trompeur.",
+  observer:{q:"Agis comme un professeur de philosophie. Je me demande si je dois déménager près de mes enfants. Ne me donne pas ta réponse : pose-moi une question à la fois.",r:"Belle question. Commençons simplement : quand vous imaginez votre vie là-bas dans un an, qu'est-ce qui vous vient en premier, du soulagement ou un sentiment de perte ?\n(l'IA attend votre réponse avant de poser la question suivante)"},
+  pratiquer:PROF+"Peut-on être heureux sans se sentir utile aux autres ?",
+  quiz:[["Que fait la méthode de Socrate ?",["Elle donne la bonne réponse","Elle pose des questions pour vous faire réfléchir","Elle résume un texte"],1,"Socrate disait « accoucher les esprits » : la réponse vient de vous."],
+        ["« Tout le monde le fait, donc c'est bien. » C'est…",["Un argument solide","Un appel à la foule","Une preuve scientifique"],1,"Le nombre de personnes ne prouve pas qu'une chose est juste."],
+        ["L'IA vous donne un raisonnement très convaincant. Vous…",["L'acceptez tel quel","Cherchez ce qui pourrait le contredire","Le recopiez partout"],1,"Chercher l'objection, c'est le cœur de l'esprit critique."]],
+  appliquer:"Dans la rubrique Réfléchir, choisissez une question qui vous travaille et laissez Alfred vous interroger."}
+];
+var NIVEAUX=["Découverte numérique","Utilisateur autonome","Utilisateur productif","Créateur numérique","Développeur assisté IA","Entrepreneur numérique","Architecte numérique personnel"];
+var ETAPES=["Comprendre","Observer","Pratiquer","Évaluer","Valider","Appliquer"];
+
+/* ---------- État (sur l'appareil) ---------- */
+var CLE="alfred-professeur-v1";
+var S={lecons:{},essais:{},etape:{},refl:{},philo:{},idees:{}};
+try{var raw=localStorage.getItem(CLE);if(raw){var o=JSON.parse(raw);if(o&&typeof o==="object"){S.lecons=o.lecons||{};S.essais=o.essais||{};S.etape=o.etape||{};S.refl=o.refl||{};S.philo=o.philo||{};S.idees=o.idees||{};}}}catch(e){}
+function sauver(){try{localStorage.setItem(CLE,JSON.stringify(S))}catch(e){}}
+
+/* ---------- Outils ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+var toastT;
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},2600)}
+function copier(txt){try{if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(txt).then(function(){toast("Demande copiée : collez-la dans l'IA")},function(){toast("Sélectionnez le texte et copiez-le")})}}catch(e){}toast("Sélectionnez le texte et copiez-le");return null}
+function lienIA(a,txt){return a.q?a.q+encodeURIComponent(txt):a.site}
+function essai(id){S.essais[id]=(S.essais[id]||0)+1;sauver()}
+function nbFaites(){return Object.keys(S.lecons).filter(function(k){return S.lecons[k]&&S.lecons[k].ok}).length}
+function niveau(){return nbFaites()>=LECONS.length?2:1}
+function minutes(){var m=0;Object.keys(S.lecons).forEach(function(k){if(S.lecons[k].ok)m+=S.lecons[k].min||0});return m}
+function fmtMin(m){if(!m)return"0 min";var h=Math.floor(m/60),r=m%60;return(h?h+" h ":"")+(r?r+" min":"")}
+function confPastille(a){return a.conf===3?'<span class="pastille vert">Européenne</span>':a.conf===1?'<span class="pastille rouge">Pas de données perso</span>':'<span class="pastille">États-Unis / autre</span>'}
+
+var vue=document.getElementById("vue");
+
+/* ---------- Vues ---------- */
+function vAccueil(){
+  var f=nbFaites();
+  var suivante=0;for(var i=0;i<LECONS.length;i++){if(!(S.lecons[i]&&S.lecons[i].ok)){suivante=i;break}}
+  vue.innerHTML='<div class="stack">'+
+   '<div class="feuille cahier stack">'+
+     '<span class="eyebrow">Le principe d\'Alfred</span>'+
+     '<p class="principe">Il existe des dizaines d\'IA gratuites. Alfred vous aide à choisir la bonne, et vous apprend à vous en servir pour la vie de tous les jours.</p>'+
+     '<div class="row"><a class="btn" href="#orienter">Que voulez-vous faire ?</a>'+
+     (f<LECONS.length?'<a class="btn sec" href="#lecon-'+(suivante+1)+'">'+(f?'Reprendre la leçon '+(suivante+1):'Commencer la 1re leçon')+'</a>':'<a class="btn sec" href="#progression">Voir mes progrès</a>')+'</div>'+
+   '</div>'+
+   '<div class="portes">'+
+     '<a class="porte" href="#guide"><strong>Guide des IA gratuites</strong><span class="doux">'+IA.length+' IA expliquées : ce qu\'elles font bien, ce qui est gratuit, et ce qu\'elles font de vos données.</span></a>'+
+     '<a class="porte" href="#orienter"><strong>Quelle IA pour mon besoin ?</strong><span class="doux">Décrivez ce que vous voulez faire. Alfred vous conseille 3 IA et prépare votre demande.</span></a>'+
+     '<a class="porte" href="#parcours"><strong>Tout ce que l\'IA peut faire pour vous</strong><span class="doux">'+HORIZON.reduce(function(a,d){return a+d.x.length},0)+' idées dans '+HORIZON.length+' domaines de la vie, et '+LECONS.length+' leçons pour bien démarrer. '+f+' sur '+LECONS.length+' terminée'+(f>1?'s':'')+'.</span></a>'+
+     '<a class="porte" href="#reflechir"><strong>Réfléchir avec Alfred</strong><span class="doux">Comme un professeur de philosophie : des questions pour voir clair, et un parcours de dix grands textes, de Socrate à Kant.</span></a>'+
+     '<a class="porte" href="#progression"><strong>Mes progrès</strong><span class="doux">Niveau '+niveau()+' · '+(f*2)+' compétences sur '+(LECONS.length*2)+' · temps gagné estimé : '+fmtMin(minutes())+'.</span></a>'+
+   '</div></div>';
+}
+
+var filtre="tous";
+function vGuide(){
+  var chips=[["tous","Toutes"],["texte","Texte"],["image","Image"],["audio","Musique"],["code","Code"],["eu","Européennes"]];
+  var liste=IA.filter(function(a){return filtre==="tous"||(filtre==="eu"?a.zone==="eu":a.cat.indexOf(filtre)>=0)});
+  vue.innerHTML='<div class="stack">'+
+   '<div class="stack" style="gap:6px"><h2>Guide des IA gratuites</h2><p class="doux">Seulement des IA avec une vraie offre gratuite. Informations vérifiées en '+MAJ+' : les offres changent souvent.</p></div>'+
+   '<div class="row" role="group" aria-label="Filtrer">'+chips.map(function(c){return'<button class="chip" data-f="'+c[0]+'" aria-pressed="'+(filtre===c[0])+'">'+c[1]+'</button>'}).join("")+'</div>'+
+   '<div class="fiches">'+liste.map(function(a){
+     return '<article class="fiche">'+
+      '<div class="fiche-tete"><div><h3>'+esc(a.nom)+'</h3><span class="doux petit">'+esc(a.par)+' · '+esc(a.origine)+'</span></div><div class="note" title="Note Alfred">'+a.note+'<small>/10</small></div></div>'+
+      '<div class="cases">'+Object.keys(CATS).map(function(k){return'<span class="case'+(a.cat.indexOf(k)>=0?' oui':'')+'">'+CATS[k]+'</span>'}).join("")+'</div>'+
+      '<p>'+esc(a.forts)+'</p>'+
+      '<div class="row">'+confPastille(a)+(S.essais[a.id]?'<span class="pastille vert">Essayée</span>':'')+'</div>'+
+      '<details><summary>Voir la fiche complète</summary><dl class="infos">'+
+        '<dt>Points faibles</dt><dd>'+esc(a.faibles)+'</dd>'+
+        '<dt>Gratuit ?</dt><dd>'+esc(a.gratuit)+'</dd>'+
+        '<dt>Vos données</dt><dd>'+esc(a.confid)+'</dd>'+
+        '<dt>Mise à jour</dt><dd>'+MAJ+'</dd>'+
+      '</dl></details>'+
+      '<a class="btn sec" href="'+a.site+'" target="_blank" rel="noopener" data-essai="'+a.id+'">Ouvrir '+esc(a.nom)+'</a>'+
+     '</article>'}).join("")+'</div></div>';
+}
+
+var derniere={txt:"",perso:false,eu:false};
+function orienter(txt,perso,eu){
+  var b=null;for(var i=0;i<BESOINS.length;i++){if(BESOINS[i].re.test(txt)){b=BESOINS[i];break}}
+  b=b||GENERAL;
+  var liste=b.ia.slice();
+  if(perso||eu){
+    liste=liste.filter(function(x){return byId[x[0]].zone!=="cn"});
+    if(!liste.some(function(x){return x[0]==="lechat"})&&b.id!=="musique"){liste.unshift(["lechat","IA européenne : vos informations restent sous le droit européen."])}
+    else{liste.sort(function(x,y){return(byId[y[0]].zone==="eu")-(byId[x[0]].zone==="eu")})}
+    var reserve=["claude","chatgpt","copilot"];
+    while(liste.length<3){var r=reserve.shift();if(!liste.some(function(x){return x[0]===r}))liste.push([r,"Bon choix de secours."])}
+  }
+  return {b:b,liste:liste.slice(0,3)};
+}
+function vOrienter(){
+  vue.innerHTML='<div class="stack">'+
+   '<div class="stack" style="gap:6px"><h2>Que voulez-vous faire ?</h2><p class="doux">Écrivez votre besoin avec vos mots. Alfred choisit les IA et prépare une demande bien formulée, prête à coller.</p></div>'+
+   '<form class="feuille stack" id="form-o">'+
+     '<label for="besoin" class="eyebrow">Mon besoin</label>'+
+     '<textarea id="besoin" placeholder="Par exemple : écrire à ma banque pour contester des frais">'+esc(derniere.txt)+'</textarea>'+
+     '<div class="idees">'+IDEES.map(function(t){return'<button type="button" class="chip" data-idee="'+esc(t)+'">'+esc(t)+'</button>'}).join("")+'</div>'+
+     '<label class="coche"><input type="checkbox" id="perso"'+(derniere.perso?' checked':'')+'> Ma demande contient des informations personnelles</label>'+
+     '<label class="coche"><input type="checkbox" id="eu"'+(derniere.eu?' checked':'')+'> Je préfère une IA européenne</label>'+
+     '<div><button class="btn" type="submit">Trouver la bonne IA</button></div>'+
+   '</form><div id="resultat" class="stack"></div></div>';
+  if(derniere.txt)afficherReco();
+}
+function afficherReco(){
+  var res=orienter(derniere.txt,derniere.perso,derniere.eu);
+  var demande=res.b.modele.replace("{besoin}",derniere.txt.trim());
+  var el=document.getElementById("resultat");
+  el.innerHTML=
+   '<div class="row"><span class="eyebrow">Alfred a reconnu</span><span class="pastille">'+esc(res.b.titre)+'</span></div>'+
+   (derniere.perso?'<div class="alerte">Vous avez coché « informations personnelles » : Alfred écarte les IA chinoises et met une IA européenne en premier. Remplacez quand même vos noms, adresses et numéros par [NOM], [ADRESSE]…</div>':'')+
+   '<div class="feuille stack">'+res.liste.map(function(x,i){var a=byId[x[0]];
+     return '<div class="reco"><div class="rang">'+(i+1)+'</div><div class="stack" style="gap:8px;min-width:0">'+
+      '<div class="row"><h3>'+esc(a.nom)+'</h3>'+confPastille(a)+'</div><p>'+esc(x[1])+'</p>'+
+      '<div class="jauges"><span><span class="doux">Temps estimé :</span> '+res.b.temps+'</span><span><span class="doux">Difficulté :</span> '+res.b.cplx+'</span><span><span class="doux">Gratuit :</span> oui, quota limité</span></div>'+
+      '<div><a class="btn'+(i?' sec':'')+'" href="'+lienIA(a,demande)+'" target="_blank" rel="noopener" data-essai="'+a.id+'" data-copie="1">Copier la demande et ouvrir '+esc(a.nom)+'</a></div>'+
+     '</div></div>'}).join('<hr style="border:0;border-top:1px solid var(--trait);margin:0">')+'</div>'+
+   '<div class="feuille cahier stack"><span class="eyebrow">Votre demande, prête à coller</span><div class="demande" id="demande">'+esc(demande)+'</div>'+
+   '<p class="doux petit">Pourquoi elle marche : elle donne le contexte, le résultat attendu et le ton. C\'est ce qu\'on apprend dans la leçon '+res.b.lecon+'.</p>'+
+   '<div class="row"><button class="btn sec" type="button" id="copier-d">Copier seulement</button><a class="btn sec" href="#lecon-'+res.b.lecon+'">Aller à la leçon '+res.b.lecon+'</a></div></div>';
+  document.getElementById("copier-d").onclick=function(){copier(demande)};
+  el.querySelectorAll("[data-copie]").forEach(function(l){l.addEventListener("click",function(){copier(demande)})});
+}
+
+function vParcours(){
+  var f=nbFaites();
+  vue.innerHTML='<div class="stack">'+
+   '<div class="stack" style="gap:6px"><span class="eyebrow">Parcours fondamental</span><h2>Tout ce que l\'IA peut faire pour vous</h2><p class="doux">'+LECONS.length+' leçons d\'environ 10 minutes. Chacune suit les mêmes étapes : comprendre, observer, pratiquer, évaluer, valider, appliquer.</p></div>'+
+   '<div class="barre" aria-label="'+f+' leçons sur '+LECONS.length+'"><i style="width:'+(f/LECONS.length*100)+'%"></i></div>'+
+   '<div class="lecons">'+LECONS.map(function(l,i){var ok=S.lecons[i]&&S.lecons[i].ok;
+     return '<a class="lecon-lien'+(ok?' fait':'')+'" href="#lecon-'+(i+1)+'"><span class="num">'+(ok?'✓':(i+1))+'</span><span class="stack" style="gap:2px;min-width:0"><strong>'+esc(l.t)+'</strong><span class="doux petit">'+esc(COMP[i].join(" · "))+'</span></span><span class="pastille'+(ok?' vert':'')+'">'+(ok?'Validée':(S.etape[i]?'En cours':'À faire'))+'</span></a>'}).join("")+'</div>'+
+   '<p class="doux petit">Prochains parcours prévus : Choisir la bonne IA, Bien formuler ses demandes, Windows 11 en sécurité, Android et tablette.</p>'+vHorizon()+'</div>';
+}
+
+function vLecon(i){
+  var l=LECONS[i];if(!l){location.hash="parcours";return}
+  var e=S.etape[i]||0; var ia=byId[l.ia];
+  var contenu="";
+  if(e===0)contenu='<p>'+esc(l.comprendre)+'</p>';
+  if(e===1)contenu='<p class="doux">Voici un exemple de demande, et le genre de réponse obtenue :</p><div class="demande">'+esc(l.observer.q)+'</div><div class="feuille" style="background:var(--papier)"><span class="eyebrow">Réponse de l\'IA (exemple)</span><p style="white-space:pre-wrap;margin-top:6px">'+esc(l.observer.r)+'</p></div>';
+  if(e===2)contenu='<p>À vous ! Copiez cette demande, ouvrez '+esc(ia.nom)+' (ou l\'IA de votre choix) et collez-la. Lisez la réponse, puis revenez ici.</p><div class="demande">'+esc(l.pratiquer)+'</div><div class="row"><a class="btn" href="'+lienIA(ia,l.pratiquer)+'" target="_blank" rel="noopener" data-essai="'+ia.id+'" data-copie-l="1">Copier et ouvrir '+esc(ia.nom)+'</a><a class="btn sec" href="#orienter">Choisir une autre IA</a></div>';
+  if(e===3)contenu='<form class="quiz" id="quiz">'+l.quiz.map(function(q,qi){return'<fieldset><legend>'+(qi+1)+'. '+esc(q[0])+'</legend>'+q[1].map(function(o,oi){return'<label><input type="radio" name="q'+qi+'" value="'+oi+'"> '+esc(o)+'</label>'}).join("")+'<p class="expl" hidden>'+esc(q[3])+'</p></fieldset>'}).join("")+'<button class="btn" type="submit">Vérifier mes réponses</button><p id="score" class="doux" style="margin-top:10px"></p></form>';
+  if(e===4){var ok=S.lecons[i]&&S.lecons[i].ok;
+    contenu='<p>Vous avez réussi l\'évaluation. Une dernière question pour estimer le temps que l\'IA vous fait gagner :</p>'+
+    '<label for="duree">Sans l\'IA, cet exercice m\'aurait pris :</label><select id="duree"><option value="10">environ 10 minutes</option><option value="20" selected>environ 20 minutes</option><option value="45">environ 45 minutes</option><option value="90">plus d\'une heure</option></select>'+
+    '<p class="doux petit">Alfred compte ce temps moins 5 minutes passées avec l\'IA. C\'est une estimation, d\'après vos réponses.</p>'+
+    '<div class="competences">'+COMP[i].map(function(c){return'<span class="comp'+(ok?' ok':'')+'">'+esc(c)+'</span>'}).join("")+'</div>'+
+    '<div><button class="btn" id="valider" type="button">'+(ok?'Mettre à jour':'Valider mes 2 compétences')+'</button></div>'}
+  if(e===5)contenu='<div class="competences">'+COMP[i].map(function(c){return'<span class="comp ok">✓ '+esc(c)+'</span>'}).join("")+'</div><p><strong>Dans la vraie vie :</strong> '+esc(l.appliquer)+'</p><div class="row">'+(i<LECONS.length-1?'<a class="btn" href="#lecon-'+(i+2)+'">Leçon suivante</a>':'<a class="btn" href="#progression">Voir mes progrès</a>')+'<a class="btn sec" href="#parcours">Retour aux leçons</a></div>';
+
+  var maxVue=S.lecons[i]&&S.lecons[i].ok?5:Math.max(e,S.etape[i]||0);
+  vue.innerHTML='<div class="stack">'+
+   '<a href="#parcours" class="petit">← Toutes les leçons</a>'+
+   '<div class="stack" style="gap:6px"><span class="eyebrow">Leçon '+(i+1)+' sur '+LECONS.length+'</span><h2>'+esc(l.t)+'</h2></div>'+
+   '<div class="etapes">'+ETAPES.map(function(n,k){return'<button type="button" class="etape'+(k===e?' active':(k<=maxVue?' vue':''))+'" data-etape="'+k+'"'+(k>maxVue?' disabled':'')+'>'+n+'</button>'}).join("")+'</div>'+
+   '<section class="feuille cahier stack"><h3>'+ETAPES[e]+'</h3>'+contenu+'</section>'+
+   (e<3?'<div class="row"><button class="btn" id="suite" type="button">'+(e===2?'J\'ai essayé, continuer':'Continuer')+'</button></div>':'')+
+   '</div>';
+
+  var suite=document.getElementById("suite");
+  if(suite)suite.onclick=function(){S.etape[i]=e+1;sauver();vLecon(i);window.scrollTo(0,0)};
+  vue.querySelectorAll("[data-etape]").forEach(function(b){b.onclick=function(){var k=+b.dataset.etape;S.etape[i]=k;sauver();vLecon(i)}});
+  var lc=vue.querySelector("[data-copie-l]");if(lc)lc.addEventListener("click",function(){copier(l.pratiquer)});
+  var qz=document.getElementById("quiz");
+  if(qz)qz.onsubmit=function(ev){ev.preventDefault();var bons=0,rep=0;
+    l.quiz.forEach(function(q,qi){var fs=qz.querySelectorAll("fieldset")[qi];var c=fs.querySelector("input:checked");
+      fs.querySelectorAll("label").forEach(function(lb){lb.classList.remove("bon","faux")});
+      if(c){rep++;var lab=c.parentNode;if(+c.value===q[2]){bons++;lab.classList.add("bon")}else{lab.classList.add("faux")}fs.querySelector(".expl").hidden=false}});
+    var sc=document.getElementById("score");
+    if(rep<l.quiz.length){sc.textContent="Répondez aux "+l.quiz.length+" questions.";return}
+    if(bons===l.quiz.length){sc.textContent="3 sur 3, bravo !";setTimeout(function(){S.etape[i]=4;sauver();vLecon(i)},900)}
+    else{sc.textContent=bons+" sur 3. Lisez les explications et changez vos réponses."}};
+  var va=document.getElementById("valider");
+  if(va)va.onclick=function(){var d=+document.getElementById("duree").value;S.lecons[i]={ok:true,min:Math.max(0,d-5),date:new Date().toISOString().slice(0,10)};S.etape[i]=5;sauver();toast("2 compétences validées");vLecon(i)};
+}
+
+function vProgression(){
+  var f=nbFaites(),n=niveau(),essaye=Object.keys(S.essais).filter(function(k){return byId[k]});
+  var toutes=[];COMP.forEach(function(p,i){p.forEach(function(c){toutes.push([c,S.lecons[i]&&S.lecons[i].ok])})});
+  vue.innerHTML='<div class="stack">'+
+   '<div class="stack" style="gap:6px"><h2>Mes progrès</h2><p class="doux">Tout est gardé sur cet appareil, rien n\'est envoyé ailleurs.</p></div>'+
+   '<div class="chiffres">'+
+     '<div class="chiffre"><b>'+fmtMin(minutes())+'</b><span class="doux petit">temps gagné (estimation)</span></div>'+
+     '<div class="chiffre"><b>'+(f*2)+' / '+(LECONS.length*2)+'</b><span class="doux petit">compétences validées</span></div>'+
+     '<div class="chiffre"><b>'+essaye.length+'</b><span class="doux petit">IA essayées</span></div>'+
+     '<div class="chiffre"><b>'+f+' / '+LECONS.length+'</b><span class="doux petit">leçons terminées</span></div>'+
+     '<div class="chiffre"><b>'+nbIdees()+'</b><span class="doux petit">idées de l\'horizon essayées</span></div>'+
+     '<div class="chiffre"><b>'+Object.keys(S.philo).filter(function(k){return S.philo[k].ok}).length+' / '+PHILO.length+'</b><span class="doux petit">textes de philosophie compris</span></div>'+
+   '</div>'+
+   '<section class="feuille stack"><h3>Mon niveau</h3><ol class="niveaux">'+NIVEAUX.map(function(t,k){return'<li class="'+(k+1===n?'ici':'')+'"><span class="n">'+(k+1)+'</span><span>'+t+'</span>'+(k+1<n?'<span class="pastille vert">Atteint</span>':k+1===n?'<span class="pastille">Vous êtes ici</span>':k===1?'<span class="pastille ambre">Finir les '+LECONS.length+' leçons</span>':'<span class="doux petit">Bientôt</span>')+'</li>'}).join("")+'</ol></section>'+
+   '<section class="feuille stack"><h3>Mes compétences</h3><div class="competences">'+toutes.map(function(c){return'<span class="comp'+(c[1]?' ok':'')+'">'+(c[1]?'✓ ':'')+esc(c[0])+'</span>'}).join("")+'</div></section>'+
+   '<section class="feuille stack"><h3>Les IA que j\'ai essayées</h3>'+(essaye.length?'<div class="row">'+essaye.map(function(k){return'<span class="pastille">'+esc(byId[k].nom)+' · '+S.essais[k]+' fois</span>'}).join("")+'</div>':'<p class="doux">Pas encore. Ouvrez une IA depuis le guide ou une leçon : Alfred la notera ici.</p>')+'</section>'+
+   '<div class="row"><button class="btn sec" type="button" id="raz">Tout recommencer</button><span id="raz-conf"></span></div>'+
+   '</div>';
+  document.getElementById("raz").onclick=function(){var c=document.getElementById("raz-conf");c.innerHTML='<span class="doux">Effacer toute la progression ?</span> <button class="btn" type="button" id="raz-oui">Oui, effacer</button>';
+    document.getElementById("raz-oui").onclick=function(){S={lecons:{},essais:{},etape:{},refl:{},philo:{},idees:{}};sauver();toast("Progression effacée");vProgression()}};
+}
+
+/* ---------- Réfléchir : la méthode d'un professeur de philosophie ---------- */
+var PENSEES=[
+ ["Socrate, rapporté par Platon (Apologie de Socrate)","Une vie sans examen ne vaut pas d'être vécue.","Qu'avez-vous pris le temps d'examiner cette semaine ?"],
+ ["Épictète (Manuel)","Ce qui trouble les hommes, ce ne sont pas les choses, mais les jugements qu'ils portent sur les choses.","Quel jugement pourriez-vous changer sur ce qui vous préoccupe ?"],
+ ["Montaigne (Essais)","Que sais-je ?","Sur quel sujet êtes-vous très sûr(e) de vous ? Pourquoi ?"],
+ ["Sénèque (Lettres à Lucilius)","Ce n'est pas parce que les choses sont difficiles que nous n'osons pas, c'est parce que nous n'osons pas qu'elles sont difficiles.","Qu'est-ce que vous n'osez pas encore faire ?"],
+ ["Descartes (Discours de la méthode)","Le bon sens est la chose du monde la mieux partagée.","Quand avez-vous changé d'avis grâce à quelqu'un d'autre ?"],
+ ["Pascal (Pensées)","Le cœur a ses raisons que la raison ne connaît point.","Une décision récente : l'avez-vous prise avec la tête ou avec le cœur ?"],
+ ["Spinoza (Traité politique)","Ne pas se moquer, ne pas déplorer, ne pas détester, mais comprendre.","Qui aimeriez-vous mieux comprendre ?"],
+ ["Kant (Qu'est-ce que les Lumières ?)","Sapere aude : aie le courage de te servir de ton propre entendement.","Sur quoi laissez-vous les autres, ou une IA, penser à votre place ?"],
+ ["Alain (Propos)","Penser, c'est dire non.","À quelle idée toute faite aimeriez-vous dire non ?"]
+];
+var OUTILS=[
+ {id:"clarifier",t:"Clarifier une question qui me travaille",d:"La méthode de Socrate : des questions simples, l'une après l'autre, pour voir plus clair.",
+  q:["Quelle est la question qui vous occupe, en une phrase ?","Que voulez-vous dire exactement par les mots importants de cette phrase ?","Pourquoi cette question compte-t-elle pour vous maintenant ?","Sur quoi vous appuyez-vous pour pencher d'un côté ?","Que répondrait une personne sage qui pense le contraire ?","Après tout cela, comment formuleriez-vous votre question aujourd'hui ?"]},
+ {id:"decider",t:"Peser une décision",d:"Les avantages et les inconvénients, chacun avec son poids. Puis la question du cœur.",type:"balance"},
+ {id:"argument",t:"Examiner un argument",d:"L'esprit critique : repérer ce qui sonne juste mais ne l'est pas, chez un humain comme chez une IA.",
+  q:["Quelle affirmation voulez-vous examiner (lue, entendue, ou venant d'une IA) ?","Qui l'affirme, et qu'a-t-il à y gagner ?","Quelles preuves sont données ? Peut-on les vérifier ?","Qu'est-ce qui pourrait montrer que c'est faux ?","Reconnaissez-vous un des pièges ci-dessous ?"],pieges:true},
+ {id:"objectif",t:"Clarifier un objectif",d:"Passer d'une envie floue à un premier pas concret.",
+  q:["Qu'aimeriez-vous changer ou accomplir ?","Pourquoi est-ce important pour vous ? Et pourquoi encore, en creusant ?","À quoi verrez-vous que c'est réussi ?","Qu'est-ce qui dépend de vous, et qu'est-ce qui n'en dépend pas ? (la distinction d'Épictète)","Quel est le plus petit premier pas possible cette semaine ?"]},
+ {id:"journal",t:"Mon journal de réflexion",d:"Écrire pour mettre de l'ordre dans ses idées. Reste sur cet appareil.",type:"journal"}
+];
+var PIEGES=[
+ ["Généralisation hâtive","Tirer une règle d'un ou deux cas : « Mon voisin a eu un souci avec cette banque, donc elle est malhonnête. »"],
+ ["Homme de paille","Déformer l'avis de l'autre pour l'attaquer plus facilement."],
+ ["Attaque de la personne","Critiquer celui qui parle au lieu de ce qu'il dit."],
+ ["Faux dilemme","Ne présenter que deux choix alors qu'il en existe d'autres."],
+ ["Argument d'autorité","« C'est vrai parce qu'une personne célèbre l'a dit », sans preuve."],
+ ["Pente glissante","« Si on accepte ça, alors forcément le pire arrivera. »"],
+ ["Appel à la foule","« Tout le monde le fait, donc c'est bien. »"]
+];
+var DETRESSE=/suicid|me tuer|me supprimer|en finir avec|mettre fin à mes jours|plus envie de vivre|envie de mourir|veux mourir|me faire du mal|automutil|scarif|me frappe|me bat\b|nous bat\b|violence|violée|m'a violé|harcèle/i;
+function detresse(t){return DETRESSE.test(t||"")}
+function garde(){return '<div class="garde"><strong>Cet espace ne remplace pas un psychologue, un psychiatre ou un médecin.</strong> Alfred vous aide à réfléchir, il ne pose aucun diagnostic. En cas de détresse : <strong>3114</strong> (prévention du suicide, gratuit, 24 h/24).</div>'}
+function vCrise(){
+  vue.innerHTML='<div class="crise stack"><h2>Arrêtons l\'exercice ici</h2>'+
+   '<p>Ce que vous venez d\'écrire mérite d\'être entendu par une vraie personne, tout de suite. Vous n\'êtes pas seul(e). Ces numéros sont gratuits et anonymes :</p>'+
+   '<div class="numeros"><b>3114</b><span>Prévention du suicide, 24 h/24, 7 j/7</span><b>15</b><span>SAMU, en cas d\'urgence ou de danger immédiat</span><b>112</b><span>Urgences, depuis toute l\'Europe</span><b>3919</b><span>Violences conjugales et faites aux femmes, 24 h/24</span><b>09 72 39 40 50</b><span>SOS Amitié, écoute 24 h/24</span></div>'+
+   '<p>Vous pouvez aussi appeler votre médecin traitant ou une personne de confiance.</p>'+
+   '<p class="doux petit">Alfred repère certains mots seulement. Il peut se tromper dans les deux sens : si vous n\'allez pas bien, appelez quand même.</p>'+
+   '<div class="row"><a class="btn sec" href="#reflechir">Revenir plus tard</a></div></div>';
+  window.scrollTo(0,0);
+}
+function pensee(){var d=new Date();var j=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);return PENSEES[j%PENSEES.length]}
+function boutonsProf(sujet){var txt=PROF+sujet;
+  return '<div class="feuille cahier stack"><span class="eyebrow">Approfondir avec un professeur de philosophie</span>'+
+   '<p class="doux">Alfred prépare une demande qui fait jouer à l\'IA le rôle d\'un professeur de philosophie d\'université : il vous interroge au lieu de répondre à votre place.</p>'+
+   '<details><summary>Voir la demande</summary><div class="demande" style="margin-top:8px">'+esc(txt)+'</div></details>'+
+   '<div class="row">'+["claude","lechat","chatgpt"].map(function(id,k){var a=byId[id];return'<a class="btn'+(k?' sec':'')+'" href="'+lienIA(a,txt)+'" target="_blank" rel="noopener" data-essai="'+id+'" data-prof="1">Ouvrir '+esc(a.nom)+'</a>'}).join("")+'</div>'+
+   '<p class="doux petit">La demande est copiée en même temps : collez-la si la page de l\'IA s\'ouvre vide. Pour un sujet intime, préférez Le Chat (européen).</p></div>';
+}
+function vReflechir(){
+  var p=pensee();
+  vue.innerHTML='<div class="stack">'+
+   '<div class="stack" style="gap:6px"><span class="eyebrow">Cabinet de réflexion</span><h2>Réfléchir avec Alfred</h2><p class="doux">Alfred travaille ici comme un professeur de philosophie d\'université : il ne vous dit pas quoi penser, il vous pose les bonnes questions, vous aide à préciser vos mots, à peser les arguments et à repérer les pièges du raisonnement.</p></div>'+
+   garde()+
+   '<section class="feuille cahier stack"><span class="eyebrow">La pensée du jour</span><p class="citation">« '+esc(p[1])+' »</p><p class="citation-auteur">'+esc(p[0])+'</p><p><strong>À méditer :</strong> '+esc(p[2])+'</p></section>'+
+   '<div class="outils">'+OUTILS.map(function(o){return'<a class="outil" href="#outil-'+o.id+'"><strong>'+esc(o.t)+'</strong><span class="doux petit">'+esc(o.d)+'</span></a>'}).join("")+'</div>'+
+   vPhiloListe()+
+   '</div>';
+}
+function vOutil(id){
+  var o=OUTILS.filter(function(x){return x.id===id})[0];if(!o){location.hash="reflechir";return}
+  var R=S.refl[id]=S.refl[id]||{};
+  var corps="",sujet="";
+  if(o.q){R.r=R.r||[];
+    corps='<form class="feuille stack" id="form-q">'+o.q.map(function(q,k){return'<div class="question"><label for="q'+k+'">'+(k+1)+'. '+esc(q)+'</label><textarea id="q'+k+'" data-k="'+k+'">'+esc(R.r[k]||"")+'</textarea></div>'}).join("")+
+      (o.pieges?'<div class="stack" style="gap:6px">'+PIEGES.map(function(p){return'<details><summary>'+esc(p[0])+'</summary><p style="margin-top:4px">'+esc(p[1])+'</p></details>'}).join("")+'</div>':'')+
+      '<div class="row"><button class="btn" type="submit">Enregistrer mes réponses</button><button class="btn sec" type="button" id="effacer-q">Recommencer</button></div></form>';
+    sujet=o.t+".\n"+o.q.map(function(q,k){return R.r[k]?q+" "+R.r[k]:""}).filter(Boolean).join("\n");
+  }
+  if(o.type==="balance"){R.dec=R.dec||"";R.pour=R.pour||[];R.contre=R.contre||[];
+    var tp=R.pour.reduce(function(a,x){return a+x[1]},0),tc=R.contre.reduce(function(a,x){return a+x[1]},0);
+    function col(cle,titre){return'<div class="stack" style="gap:8px;min-width:0"><h3>'+titre+' <span class="pastille">'+(cle==="pour"?tp:tc)+' points</span></h3><ul>'+R[cle].map(function(x,k){return'<li><span>'+esc(x[0])+' <span class="doux petit">('+x[1]+')</span></span><button class="mini" type="button" data-suppr="'+cle+'-'+k+'" aria-label="Retirer">✕</button></li>'}).join("")+'</ul>'+
+      '<div class="ajout"><input id="in-'+cle+'" placeholder="'+(cle==="pour"?"Un avantage":"Un inconvénient")+'"><select id="w-'+cle+'" aria-label="Importance"><option value="1">petit</option><option value="2" selected>moyen</option><option value="3">important</option></select><button class="btn sec" type="button" data-ajout="'+cle+'">Ajouter</button></div></div>'}
+    var verdict=(tp||tc)?(tp>tc?"La balance penche vers « oui » ("+tp+" contre "+tc+").":tc>tp?"La balance penche vers « non » ("+tc+" contre "+tp+").":"La balance est à l'équilibre."):"";
+    corps='<div class="feuille stack"><div class="question"><label for="dec">Quelle décision hésitez-vous à prendre ?</label><textarea id="dec" style="min-height:56px">'+esc(R.dec)+'</textarea></div>'+
+      '<div class="balance">'+col("pour","Pour")+col("contre","Contre")+'</div>'+
+      (verdict?'<p><strong>'+verdict+'</strong> Mais Pascal rappelait que « le cœur a ses raisons que la raison ne connaît point ». Imaginez que vous avez choisi le contraire : vous sentez-vous soulagé(e) ou déçu(e) ?</p>':'<p class="doux">Ajoutez quelques avantages et inconvénients, avec leur importance.</p>')+
+      '</div>';
+    sujet="Je dois décider : "+R.dec+"\nPour : "+R.pour.map(function(x){return x[0]}).join(", ")+"\nContre : "+R.contre.map(function(x){return x[0]}).join(", ");
+  }
+  if(o.type==="journal"){R.e=R.e||[];
+    corps='<form class="feuille stack" id="form-j"><div class="question"><label for="jt">Qu\'avez-vous en tête aujourd\'hui ?</label><textarea id="jt" style="min-height:120px"></textarea></div><div><button class="btn" type="submit">Enregistrer</button></div></form>'+
+      (R.e.length?'<div class="stack">'+R.e.slice().reverse().map(function(x,k){var idx=R.e.length-1-k;return'<div class="feuille stack" style="gap:6px"><div class="row" style="justify-content:space-between"><span class="eyebrow">'+esc(x.d)+'</span><button class="mini" type="button" data-jsuppr="'+idx+'" aria-label="Supprimer">✕</button></div><p style="white-space:pre-wrap">'+esc(x.t)+'</p></div>'}).join("")+'</div>':'');
+    sujet=R.e.length?R.e[R.e.length-1].t:"une pensée de mon journal";
+  }
+  vue.innerHTML='<div class="stack"><a href="#reflechir" class="petit">← Réfléchir avec Alfred</a>'+
+   '<div class="stack" style="gap:6px"><h2>'+esc(o.t)+'</h2><p class="doux">'+esc(o.d)+'</p></div>'+garde()+corps+boutonsProf(sujet)+'</div>';
+
+  function verifier(t){if(detresse(t)){vCrise();return true}return false}
+  var fq=document.getElementById("form-q");
+  if(fq){fq.onsubmit=function(ev){ev.preventDefault();var tout=[];fq.querySelectorAll("textarea").forEach(function(t){tout.push(t.value)});
+      if(verifier(tout.join(" ")))return;R.r=tout;sauver();toast("Réponses enregistrées");vOutil(id)};
+    document.getElementById("effacer-q").onclick=function(){R.r=[];sauver();vOutil(id)}}
+  var dec=document.getElementById("dec");
+  if(dec)dec.onchange=function(){if(verifier(dec.value))return;R.dec=dec.value;sauver()};
+  vue.querySelectorAll("[data-ajout]").forEach(function(b){b.onclick=function(){var c=b.dataset.ajout,inp=document.getElementById("in-"+c);var v=inp.value.trim();if(!v)return;if(verifier(v))return;
+    if(dec)R.dec=dec.value;R[c].push([v,+document.getElementById("w-"+c).value]);sauver();vOutil(id);var n=document.getElementById("in-"+c);if(n)n.focus()}});
+  vue.querySelectorAll("[data-suppr]").forEach(function(b){b.onclick=function(){var x=b.dataset.suppr.split("-");R[x[0]].splice(+x[1],1);sauver();vOutil(id)}});
+  var fj=document.getElementById("form-j");
+  if(fj)fj.onsubmit=function(ev){ev.preventDefault();var t=document.getElementById("jt").value.trim();if(!t)return;if(verifier(t))return;
+    R.e.push({d:new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"}),t:t});sauver();toast("Enregistré");vOutil(id)};
+  vue.querySelectorAll("[data-jsuppr]").forEach(function(b){b.onclick=function(){R.e.splice(+b.dataset.jsuppr,1);sauver();vOutil(id)}});
+  vue.querySelectorAll("[data-prof]").forEach(function(l){l.addEventListener("click",function(){copier(PROF+sujet)})});
+}
+
+/* ---------- Parcours de philosophie ---------- */
+var PHILO=[
+ {a:"Socrate",dates:"vers 470 – 399 av. J.-C.",oeuvre:"Platon, Apologie de Socrate (38a)",theme:"Savoir qu'on ne sait pas",
+  extrait:"Une vie sans examen ne vaut pas d'être vécue.",
+  contexte:"Socrate n'a rien écrit : nous le connaissons par son élève Platon. Accusé d'impiété et de corrompre la jeunesse d'Athènes, il se défend devant ses juges. Il est condamné à mort et refuse de s'enfuir.",
+  explication:"L'oracle de Delphes avait déclaré que nul n'était plus sage que Socrate. Étonné, Socrate interroge les gens réputés savants et découvre qu'ils croient savoir ce qu'ils ignorent. Sa seule sagesse est donc de savoir qu'il ne sait pas. « Examiner sa vie », c'est se demander pourquoi on agit, ce qu'on entend par bien, juste ou heureux, au lieu de vivre sur des opinions reçues. Sa méthode, la maïeutique (l'art de faire accoucher les esprits), procède par questions : c'est à l'autre de trouver.",
+  notions:[["Maïeutique","Méthode par questions qui aide l'autre à découvrir lui-même la vérité."],["Ironie socratique","Feindre l'ignorance pour amener l'interlocuteur à voir les failles de sa pensée."],["Opinion (doxa)","Ce que l'on croit sans l'avoir examiné."]],
+  objection:"Peut-on tout examiner ? Une vie passée à questionner risque l'indécision. Montaigne, plus tard, répondra qu'il faut aussi savoir vivre « à propos », sans tout soumettre au doute.",
+  aujourdhui:"Face à une réponse d'IA, l'attitude socratique consiste à demander : qu'entends-tu par là ? Sur quoi t'appuies-tu ? Et si c'était faux ?",
+  exercice:"Quelle opinion importante pour vous n'avez-vous jamais vraiment examinée ? D'où vous vient-elle ?",
+  quiz:[["Quelle est la « sagesse » de Socrate ?",["Tout savoir","Savoir qu'il ne sait pas","Ne rien chercher"],1,"Il sait au moins qu'il ignore, contrairement à ceux qui croient savoir."],
+        ["La maïeutique, c'est…",["Faire trouver la vérité par des questions","Un discours savant","Un régime alimentaire"],0,"Socrate se comparait à une sage-femme : il fait « accoucher » les esprits."],
+        ["Qui nous a transmis la pensée de Socrate ?",["Socrate lui-même","Platon","Descartes"],1,"Socrate n'a rien écrit ; Platon le met en scène dans ses dialogues."]]},
+
+ {a:"Platon",dates:"vers 428 – 348 av. J.-C.",oeuvre:"La République, livre VII",theme:"L'apparence et la réalité",
+  extrait:"Figure-toi des hommes dans une demeure souterraine, en forme de caverne… Enchaînés depuis l'enfance, ils ne voient que les ombres projetées sur le mur.",
+  contexte:"Élève de Socrate, Platon fonde à Athènes l'Académie, première grande école de philosophie. L'allégorie de la caverne est la plus célèbre image de la philosophie occidentale.",
+  explication:"Des prisonniers enchaînés ne voient que des ombres d'objets portés derrière eux, et les prennent pour la réalité. Si l'un d'eux est libéré, la lumière l'éblouit d'abord : sortir de la caverne est douloureux. Peu à peu, il découvre les vraies choses, puis le soleil, image du Bien. S'il redescend pour libérer les autres, ceux-ci se moquent de lui, voire veulent le tuer (allusion au sort de Socrate). Apprendre, c'est se tourner vers la lumière, et cela demande un effort.",
+  notions:[["Allégorie","Récit imagé qui exprime une idée abstraite."],["Monde sensible / monde intelligible","Ce que perçoivent nos sens, opposé à ce que seule la raison saisit (les Idées)."],["Éducation","Pour Platon, non pas remplir l'âme, mais la tourner vers la vérité."]],
+  objection:"Aristote, élève de Platon, refusera de séparer deux mondes : pour lui, c'est en observant les choses sensibles que l'on comprend leur forme.",
+  aujourdhui:"Nos écrans sont-ils une nouvelle caverne ? Fils d'actualité, images retouchées, textes générés par IA : ce que nous voyons n'est parfois qu'une ombre de la réalité.",
+  exercice:"Racontez une fois où vous avez découvert que ce que vous preniez pour vrai n'était qu'une « ombre ». Qu'avez-vous ressenti ?",
+  quiz:[["Que voient les prisonniers ?",["Le soleil","Des ombres","Des livres"],1,"Ils prennent les ombres pour la seule réalité."],
+        ["Pourquoi la sortie est-elle difficile ?",["La lumière éblouit","La porte est fermée","Il pleut"],0,"Toute découverte de la vérité demande un effort et dérange d'abord."],
+        ["Le soleil représente…",["Le pouvoir","Le Bien","L'été"],1,"Pour Platon, le Bien éclaire tout le reste, comme le soleil."]]},
+
+ {a:"Aristote",dates:"384 – 322 av. J.-C.",oeuvre:"Éthique à Nicomaque, livres I et II",theme:"Le bonheur et la vertu",
+  extrait:"Une hirondelle ne fait pas le printemps, ni non plus un seul jour : de même ce n'est ni un seul jour ni un court espace de temps qui font la félicité.",
+  contexte:"Élève de Platon pendant vingt ans, puis précepteur d'Alexandre le Grand, Aristote a écrit sur presque tout : logique, biologie, politique, morale. L'Éthique à Nicomaque porte sur la question : comment bien vivre ?",
+  explication:"Tout le monde veut être heureux, mais on ne s'accorde pas sur ce qu'est le bonheur : plaisir, richesse, honneurs ? Pour Aristote, le bonheur est une activité de toute une vie, conforme à la vertu. La vertu n'est pas un don : elle s'acquiert par l'habitude. « C'est en pratiquant les actions justes que nous devenons justes. » Et la vertu est un juste milieu entre deux excès : le courage se tient entre la lâcheté et la témérité, la générosité entre l'avarice et la prodigalité.",
+  notions:[["Eudémonia","Le bonheur comme épanouissement durable de toute une vie."],["Juste milieu","La vertu se tient entre deux excès opposés."],["Habitude (hexis)","Disposition acquise par la répétition des actes."]],
+  objection:"Kant objectera que fonder la morale sur le bonheur est fragile : chacun s'en fait une idée différente. Il cherchera une règle valable pour tous.",
+  aujourdhui:"Apprendre à utiliser l'IA ou un ordinateur relève de l'habitude : c'est en pratiquant un peu chaque jour qu'on devient à l'aise, pas en lisant un mode d'emploi une fois.",
+  exercice:"Choisissez une qualité que vous aimeriez avoir. Entre quels deux excès se situe-t-elle ? Quelle petite action répéter cette semaine pour l'acquérir ?",
+  quiz:[["Pour Aristote, le bonheur est…",["Un plaisir d'un instant","Une activité de toute une vie","Une affaire de chance"],1,"D'où l'image de l'hirondelle : un beau jour ne suffit pas."],
+        ["Comment devient-on courageux ?",["En naissant ainsi","En agissant courageusement","En lisant"],1,"La vertu s'acquiert par l'habitude."],
+        ["Le courage est le juste milieu entre…",["La lâcheté et la témérité","La joie et la peine","Le froid et le chaud"],0,"Trop peu, c'est fuir ; trop, c'est foncer sans réfléchir."]]},
+
+ {a:"Épicure",dates:"341 – 270 av. J.-C.",oeuvre:"Lettre à Ménécée",theme:"Le plaisir et les désirs",
+  extrait:"Accoutume-toi à penser que la mort n'est rien pour nous.",
+  contexte:"Épicure fonde à Athènes « le Jardin », une école ouverte aux femmes et aux esclaves. Sa courte Lettre à Ménécée résume sa sagesse : se libérer des peurs pour vivre heureux.",
+  explication:"La mort n'est rien pour nous : tant que nous sommes là, elle n'est pas là, et quand elle est là, nous ne sommes plus. La craindre gâche donc la vie. Épicure n'est pas un fêtard : le plaisir qu'il recherche est l'absence de trouble de l'âme (ataraxie) et de douleur du corps. Il trie les désirs : naturels et nécessaires (manger, boire, l'amitié), naturels mais non nécessaires (un mets raffiné), ni naturels ni nécessaires (la gloire, la richesse sans fin). Le sage satisfait les premiers et se méfie des derniers.",
+  notions:[["Ataraxie","Tranquillité de l'âme, absence de trouble."],["Hédonisme","Doctrine qui fait du plaisir le but de la vie (chez Épicure, un plaisir sobre)."],["Tri des désirs","Distinguer les désirs naturels et nécessaires des désirs vains."]],
+  objection:"Peut-on vraiment ne pas craindre la mort de ceux qu'on aime ? Le raisonnement d'Épicure vaut pour sa propre mort, moins pour le deuil.",
+  aujourdhui:"La publicité et les réseaux fabriquent des désirs « ni naturels ni nécessaires ». Le tri d'Épicure est un excellent outil de budget serein.",
+  exercice:"Listez trois de vos désirs actuels et classez-les selon Épicure. Lequel pourriez-vous abandonner sans regret ?",
+  quiz:[["Le plaisir selon Épicure, c'est surtout…",["Les fêtes sans fin","L'absence de trouble","La richesse"],1,"L'ataraxie : une âme tranquille."],
+        ["La gloire est un désir…",["Naturel et nécessaire","Ni naturel ni nécessaire","Indispensable"],1,"Elle n'a pas de limite et rend dépendant des autres."],
+        ["Pourquoi la mort « n'est rien pour nous » ?",["Parce qu'on ne la vit jamais en étant là","Parce qu'elle n'existe pas","Parce qu'on est immortel"],0,"Quand elle est là, nous ne sommes plus là pour la ressentir."]]},
+
+ {a:"Épictète",dates:"vers 50 – 130",oeuvre:"Manuel, chapitres I et V",theme:"Ce qui dépend de nous",
+  extrait:"Parmi les choses, les unes dépendent de nous, les autres n'en dépendent pas. — Ce qui trouble les hommes, ce ne sont pas les choses, mais les jugements qu'ils portent sur les choses.",
+  contexte:"Ancien esclave devenu philosophe stoïcien, Épictète enseigne à Rome puis en Grèce. Son élève Arrien a rassemblé l'essentiel de sa pensée dans le Manuel, un petit livre de poche de la sagesse.",
+  explication:"Dépendent de nous : nos jugements, nos désirs, nos choix. Ne dépendent pas de nous : notre corps, nos biens, la réputation, ce que font les autres. Le malheur vient de vouloir contrôler ce qui nous échappe. La liberté consiste à porter toute son énergie sur ce qui dépend de nous, et à accepter le reste. Et souvent, ce n'est pas l'événement qui nous blesse, mais l'idée que nous nous en faisons : on peut travailler sur ce jugement.",
+  notions:[["Stoïcisme","École qui place le bonheur dans la vertu et l'accord avec la nature."],["Liberté intérieure","Celle que personne ne peut nous ôter : celle de nos jugements."],["Représentation","L'image ou l'idée que nous nous faisons d'un événement."]],
+  objection:"Accepter ce qui ne dépend pas de nous, est-ce se résigner à l'injustice ? Les stoïciens répondent que l'on doit agir de toutes ses forces sur sa part, mais sans se ronger pour le résultat.",
+  aujourdhui:"Les thérapies cognitives modernes s'inspirent directement d'Épictète : changer son regard sur une situation change la manière dont on la vit.",
+  exercice:"Pensez à un souci actuel. Faites deux colonnes : ce qui dépend de moi, ce qui n'en dépend pas. Que faire cette semaine dans la première colonne ?",
+  quiz:[["Qu'est-ce qui dépend de nous selon Épictète ?",["Notre réputation","Nos jugements","La météo"],1,"Nos opinions, désirs et choix sont notre domaine."],
+        ["Qu'est-ce qui nous trouble vraiment ?",["Les choses elles-mêmes","Nos jugements sur les choses","Les autres"],1,"Le chapitre V du Manuel."],
+        ["Qui était Épictète ?",["Un empereur","Un ancien esclave","Un médecin"],1,"Ce qui donne beaucoup de poids à sa leçon de liberté intérieure."]]},
+
+ {a:"Montaigne",dates:"1533 – 1592",oeuvre:"Essais, livre I chapitre 31 « Des cannibales » et livre III",theme:"Le doute et l'autre",
+  extrait:"Chacun appelle barbarie ce qui n'est pas de son usage. — Chaque homme porte la forme entière de l'humaine condition.",
+  contexte:"Magistrat à Bordeaux, maire de la ville, Montaigne se retire dans sa « librairie » pour écrire les Essais : il s'y prend lui-même pour sujet, afin de comprendre l'être humain. Sa devise : « Que sais-je ? ».",
+  explication:"Ayant rencontré des Indiens du Brésil amenés à Rouen, Montaigne retourne le regard : ceux que l'on dit « sauvages » ne sont pas plus barbares que les Européens qui torturent au nom de la religion. Nous jugeons les autres à l'aune de nos habitudes. D'où son scepticisme : nos certitudes sont souvent des coutumes. En s'observant lui-même, homme ordinaire, il pense découvrir l'humain en général : chacun porte en lui toute la condition humaine.",
+  notions:[["Scepticisme","Attitude qui suspend le jugement faute de certitude."],["Relativisme culturel","Idée que nos jugements dépendent de nos coutumes."],["Essai","Pour Montaigne, une tentative, une mise à l'épreuve de son jugement."]],
+  objection:"Si tout dépend de la coutume, peut-on encore condamner quoi que ce soit ? Montaigne lui-même condamne la cruauté : son doute n'est pas l'indifférence.",
+  aujourdhui:"Les IA ont, elles aussi, des « usages » : elles reflètent la culture des textes sur lesquels elles ont appris. Comparer plusieurs IA, c'est un peu voyager à la manière de Montaigne.",
+  exercice:"Quelle coutume d'un autre pays ou d'une autre génération vous a choquée ? Et si l'on retournait le regard sur l'une des vôtres ?",
+  quiz:[["La devise de Montaigne est…",["Je pense donc je suis","Que sais-je ?","Connais-toi toi-même"],1,"Elle résume son doute."],
+        ["Qui appelle-t-on « barbare » selon lui ?",["Celui qui a d'autres usages que nous","Celui qui est cruel","Personne"],0,"Nous jugeons les autres d'après nos habitudes."],
+        ["Pourquoi parle-t-il de lui-même ?",["Par vanité","Pour comprendre l'être humain","Pour devenir célèbre"],1,"Chacun porte la forme entière de l'humaine condition."]]},
+
+ {a:"René Descartes",dates:"1596 – 1650",oeuvre:"Discours de la méthode (1637)",theme:"La méthode et le doute",
+  extrait:"Je pense, donc je suis. — Ne recevoir jamais aucune chose pour vraie que je ne la connusse évidemment être telle.",
+  contexte:"Mathématicien, physicien et philosophe, Descartes écrit en français (et non en latin) pour être lu de tous. Il cherche une méthode sûre pour bien conduire sa raison.",
+  explication:"Descartes décide de douter de tout ce qui peut l'être : les sens trompent, les rêves ressemblent à la réalité. Une chose résiste au doute : pendant que je doute, je pense, et pour penser il faut être. D'où « je pense, donc je suis ». Il propose quatre règles : n'accepter que l'évident ; diviser chaque difficulté en petites parties ; aller du plus simple au plus complexe ; tout revoir pour ne rien oublier.",
+  notions:[["Doute méthodique","Douter volontairement de tout pour trouver une certitude solide."],["Cogito","« Je pense » : la première vérité indubitable."],["Évidence","Ce qui se présente si clairement à l'esprit qu'on ne peut en douter."]],
+  objection:"Peut-on vraiment douter de tout ? Pascal reprochera à Descartes de vouloir tout fonder sur la raison et d'oublier le cœur.",
+  aujourdhui:"Les quatre règles sont parfaites pour travailler avec une IA : vérifier ce qui est affirmé, découper un gros problème en petites demandes, avancer pas à pas, puis relire l'ensemble.",
+  exercice:"Prenez un projet qui vous paraît trop gros. Appliquez la deuxième règle : découpez-le en cinq petites étapes.",
+  quiz:[["Pourquoi Descartes doute-t-il de tout ?",["Par paresse","Pour trouver une certitude solide","Par tristesse"],1,"Le doute est un outil, pas une fin."],
+        ["Quelle certitude résiste au doute ?",["Le monde existe","Je pense, donc je suis","Les mathématiques"],1,"Même si je me trompe, il faut que je sois pour me tromper."],
+        ["Diviser chaque difficulté en petites parties, c'est…",["La règle d'analyse","Une règle de politesse","Une recette"],0,"C'est la deuxième règle de la méthode."]]},
+
+ {a:"Blaise Pascal",dates:"1623 – 1662",oeuvre:"Pensées",theme:"Grandeur et misère de l'homme",
+  extrait:"L'homme n'est qu'un roseau, le plus faible de la nature ; mais c'est un roseau pensant. — Tout le malheur des hommes vient d'une seule chose, qui est de ne savoir pas demeurer en repos dans une chambre.",
+  contexte:"Génie précoce des mathématiques, inventeur d'une machine à calculer, Pascal se consacre ensuite à la foi. Les Pensées sont des fragments d'une apologie du christianisme restée inachevée.",
+  explication:"L'homme est fragile : une goutte d'eau suffit à le tuer. Mais il sait qu'il meurt, alors que l'univers n'en sait rien : sa grandeur est dans la pensée. Pourtant, l'homme fuit cette pensée : il se divertit (jeu, chasse, agitation) pour ne pas penser à sa condition. Le « divertissement » nous détourne de nous-mêmes. Enfin, la raison ne peut pas tout : « le cœur a ses raisons que la raison ne connaît point ».",
+  notions:[["Divertissement","Ce qui nous détourne de penser à notre condition."],["Esprit de géométrie / esprit de finesse","Raisonner par démonstration, ou saisir d'un coup d'œil des choses subtiles."],["Le cœur","Chez Pascal, une connaissance intuitive, pas seulement un sentiment."]],
+  objection:"Le divertissement est-il toujours une fuite ? Le jeu, l'art ou la conversation peuvent aussi enrichir. Tout dépend de ce qu'on fuit.",
+  aujourdhui:"Le téléphone que l'on consulte cent fois par jour est un divertissement au sens de Pascal. Rester dix minutes sans écran, c'est déjà un exercice pascalien.",
+  exercice:"Quand vous saisissez votre téléphone sans raison, que cherchez-vous à éviter ? Essayez dix minutes de « repos dans une chambre » et notez ce qui vient.",
+  quiz:[["Où est la grandeur de l'homme selon Pascal ?",["Dans sa force","Dans sa pensée","Dans sa richesse"],1,"Un roseau, mais un roseau pensant."],
+        ["Le divertissement sert à…",["Se reposer","Ne pas penser à sa condition","Apprendre"],1,"Au sens de Pascal, il nous dé-tourne de nous-mêmes."],
+        ["« Le cœur a ses raisons… » signifie…",["La raison ne peut pas tout","Il faut suivre ses caprices","Le cœur est un muscle"],0,"Certaines vérités se sentent avant de se démontrer."]]},
+
+ {a:"Baruch Spinoza",dates:"1632 – 1677",oeuvre:"Éthique, partie II (scolie de la proposition 35) et partie III",theme:"Liberté et désir",
+  extrait:"Les hommes se trompent en ce qu'ils pensent être libres ; cette opinion consiste uniquement en ce qu'ils sont conscients de leurs actions et ignorants des causes par lesquelles ils sont déterminés.",
+  contexte:"Philosophe hollandais exclu de sa communauté juive pour ses idées, Spinoza gagne sa vie en polissant des verres de lunettes. Son Éthique est écrite comme un livre de géométrie, avec définitions et démonstrations.",
+  explication:"Nous nous croyons libres parce que nous voyons ce que nous faisons, mais nous ignorons ce qui nous pousse à le faire : habitudes, émotions, influences. Pour Spinoza, la vraie liberté n'est pas de faire ce qu'on veut, mais de comprendre les causes qui nous déterminent. Le désir est l'essence même de l'homme : nous sommes des êtres qui tendent à persévérer et à s'épanouir. Les passions tristes (haine, envie, peur) nous diminuent ; la compréhension nous rend plus actifs et joyeux.",
+  notions:[["Déterminisme","Tout ce qui arrive a des causes."],["Conatus","L'effort de chaque être pour persévérer dans son être."],["Joie / tristesse","Passage à une puissance d'agir plus grande, ou plus petite."]],
+  objection:"Si tout est déterminé, sommes-nous encore responsables ? Spinoza répond que comprendre ses causes, c'est justement devenir plus libre.",
+  aujourdhui:"Les algorithmes des réseaux connaissent nos causes mieux que nous : ils prévoient ce qui nous fera cliquer. Comprendre comment ils agissent sur nous, c'est retrouver un peu de liberté au sens de Spinoza.",
+  exercice:"Pensez à une décision récente que vous croyiez libre. Quelles causes (habitude, émotion, influence) ont pu vous y pousser ?",
+  quiz:[["Pourquoi nous croyons-nous libres selon Spinoza ?",["Parce que nous le sommes","Parce que nous ignorons les causes de nos actes","Parce que Dieu le veut"],1,"Nous voyons nos actes, pas ce qui les produit."],
+        ["La vraie liberté, c'est…",["Faire ce qu'on veut","Comprendre ce qui nous détermine","Ne rien désirer"],1,"La connaissance libère."],
+        ["Comment l'Éthique est-elle écrite ?",["En vers","Comme un livre de géométrie","En dialogue"],1,"Définitions, propositions, démonstrations."]]},
+
+ {a:"Emmanuel Kant",dates:"1724 – 1804",oeuvre:"Réponse à la question : Qu'est-ce que les Lumières ? (1784)",theme:"Penser par soi-même",
+  extrait:"Les Lumières, c'est la sortie de l'homme hors de l'état de minorité, où il se maintient par sa propre faute. […] Sapere aude ! Aie le courage de te servir de ton propre entendement.",
+  contexte:"Professeur à Königsberg, Kant mène une vie si réglée qu'on dit que les habitants mettaient leur montre à l'heure sur sa promenade. Ce court article de journal est le manifeste de l'esprit des Lumières.",
+  explication:"Être « mineur », c'est laisser les autres penser à sa place : un livre pense pour moi, un directeur de conscience décide pour moi, un médecin choisit mon régime. C'est confortable, et c'est pour cela qu'on y reste, par paresse et par lâcheté. Les Lumières, c'est oser penser par soi-même. Kant ajoute que c'est difficile seul, mais plus facile pour un public libre de discuter : chacun doit pouvoir faire un usage public de sa raison.",
+  notions:[["Minorité","Incapacité de se servir de son entendement sans la direction d'autrui."],["Autonomie","Se donner à soi-même sa loi ; penser par soi-même."],["Usage public de la raison","Le droit de chacun à exprimer et discuter ses idées devant tous."]],
+  objection:"Penser par soi-même ne veut pas dire penser seul ni refuser tout conseil. Kant lui-même voit dans la libre discussion entre égaux le chemin des Lumières.",
+  aujourdhui:"C'est exactement la mission d'Alfred : une IA qui pense à votre place vous maintient « mineur » ; une IA qui vous apprend à penser vous rend autonome.",
+  exercice:"Dans quel domaine laissez-vous les autres (ou une IA) penser à votre place ? Quel petit pas d'autonomie pourriez-vous faire ?",
+  quiz:[["Être « mineur » selon Kant, c'est…",["Avoir moins de 18 ans","Laisser les autres penser à sa place","Être pauvre"],1,"C'est une minorité de l'esprit, pas de l'âge."],
+        ["Pourquoi reste-t-on mineur ?",["Par paresse et lâcheté","Par manque d'argent","Par la loi"],0,"C'est si confortable d'être guidé."],
+        ["« Sapere aude » signifie…",["Ose savoir","Sois prudent","Lis beaucoup"],0,"Aie le courage de te servir de ton propre entendement."]]}
+];
+var PROF_TEXTE="Agis comme un professeur de philosophie d'université, exigeant et bienveillant, qui parle simplement. Je travaille sur ce texte :\n";
+function vPhiloListe(){
+  var n=Object.keys(S.philo).filter(function(k){return S.philo[k]&&S.philo[k].ok}).length;
+  return '<section class="stack"><div class="stack" style="gap:6px"><span class="eyebrow">Parcours de philosophie</span><h3>Dix philosophes, dix textes</h3><p class="doux">De Socrate à Kant : un court extrait, son explication, les notions clés, une objection, un exercice et un quiz. '+n+' sur '+PHILO.length+' validée'+(n>1?'s':'')+'.</p></div>'+
+   '<div class="barre"><i style="width:'+(n/PHILO.length*100)+'%"></i></div>'+
+   '<div class="lecons">'+PHILO.map(function(p,i){var ok=S.philo[i]&&S.philo[i].ok;return'<a class="lecon-lien'+(ok?' fait':'')+'" href="#philo-'+(i+1)+'"><span class="num">'+(ok?'✓':(i+1))+'</span><span class="stack" style="gap:2px;min-width:0"><strong>'+esc(p.a)+' : '+esc(p.theme)+'</strong><span class="doux petit">'+esc(p.oeuvre)+'</span></span><span class="pastille'+(ok?' vert':'')+'">'+(ok?'Validée':'À lire')+'</span></a>'}).join("")+'</div></section>';
+}
+function vPhilo(i){
+  var p=PHILO[i];if(!p){location.hash="reflechir";return}
+  var E=S.philo[i]=S.philo[i]||{};
+  var demande=PROF_TEXTE+"« "+p.extrait+" » ("+p.a+", "+p.oeuvre+").\nExplique-le-moi comme en première année de licence : le contexte, la thèse, l'argument, puis une objection d'un autre philosophe. Ensuite, interroge-moi une question à la fois pour vérifier que j'ai compris, et corrige-moi avec bienveillance.";
+  vue.innerHTML='<div class="stack"><a href="#reflechir" class="petit">← Réfléchir avec Alfred</a>'+
+   '<div class="stack" style="gap:6px"><span class="eyebrow">Philosophie · leçon '+(i+1)+' sur '+PHILO.length+'</span><h2>'+esc(p.a)+' : '+esc(p.theme)+'</h2><p class="doux">'+esc(p.dates)+' · '+esc(p.oeuvre)+'</p></div>'+
+   '<section class="feuille cahier stack"><span class="eyebrow">Le texte</span><p class="citation">« '+esc(p.extrait)+' »</p></section>'+
+   '<section class="feuille stack"><h3>Le contexte</h3><p>'+esc(p.contexte)+'</p><h3>L\'explication</h3><p>'+esc(p.explication)+'</p></section>'+
+   '<section class="feuille stack"><h3>Les notions clés</h3><dl class="infos" style="margin:0">'+p.notions.map(function(x){return'<dt><strong>'+esc(x[0])+'</strong></dt><dd>'+esc(x[1])+'</dd>'}).join("")+'</dl></section>'+
+   '<section class="feuille stack"><h3>L\'objection</h3><p>'+esc(p.objection)+'</p><h3>Et aujourd\'hui ?</h3><p>'+esc(p.aujourdhui)+'</p></section>'+
+   '<section class="feuille cahier stack"><h3>À vous de réfléchir</h3><div class="question"><label for="px">'+esc(p.exercice)+'</label><textarea id="px">'+esc(E.rep||"")+'</textarea></div><div><button class="btn sec" type="button" id="px-ok">Enregistrer ma réflexion</button></div></section>'+
+   '<section class="feuille stack"><h3>Vérifier ce que j\'ai compris</h3><form class="quiz" id="quiz">'+p.quiz.map(function(q,qi){return'<fieldset><legend>'+(qi+1)+'. '+esc(q[0])+'</legend>'+q[1].map(function(o,oi){return'<label><input type="radio" name="q'+qi+'" value="'+oi+'"> '+esc(o)+'</label>'}).join("")+'<p class="expl" hidden>'+esc(q[3])+'</p></fieldset>'}).join("")+'<button class="btn" type="submit">Vérifier mes réponses</button><p id="score" class="doux" style="margin-top:10px">'+(E.ok?'Leçon déjà validée.':'')+'</p></form></section>'+
+   '<div class="feuille cahier stack"><span class="eyebrow">Aller plus loin avec un professeur</span><p class="doux">Alfred prépare une demande pour que l\'IA vous fasse un vrai cours sur ce texte, puis vous interroge.</p><details><summary>Voir la demande</summary><div class="demande" style="margin-top:8px">'+esc(demande)+'</div></details><div class="row">'+["claude","lechat","chatgpt"].map(function(id,k){var a=byId[id];return'<a class="btn'+(k?' sec':'')+'" href="'+lienIA(a,demande)+'" target="_blank" rel="noopener" data-essai="'+id+'" data-pcopie="1">Ouvrir '+esc(a.nom)+'</a>'}).join("")+'</div></div>'+
+   '<div class="row">'+(i>0?'<a class="btn sec" href="#philo-'+i+'">← '+esc(PHILO[i-1].a)+'</a>':'')+(i<PHILO.length-1?'<a class="btn sec" href="#philo-'+(i+2)+'">'+esc(PHILO[i+1].a)+' →</a>':'')+'</div></div>';
+  document.getElementById("px-ok").onclick=function(){var t=document.getElementById("px").value;if(detresse(t)){vCrise();return}E.rep=t;sauver();toast("Réflexion enregistrée")};
+  vue.querySelectorAll("[data-pcopie]").forEach(function(l){l.addEventListener("click",function(){copier(demande)})});
+  var qz=document.getElementById("quiz");
+  qz.onsubmit=function(ev){ev.preventDefault();var bons=0,rep=0;
+    p.quiz.forEach(function(q,qi){var fs=qz.querySelectorAll("fieldset")[qi];var c=fs.querySelector("input:checked");
+      fs.querySelectorAll("label").forEach(function(lb){lb.classList.remove("bon","faux")});
+      if(c){rep++;if(+c.value===q[2]){bons++;c.parentNode.classList.add("bon")}else c.parentNode.classList.add("faux");fs.querySelector(".expl").hidden=false}});
+    var sc=document.getElementById("score");
+    if(rep<p.quiz.length){sc.textContent="Répondez aux "+p.quiz.length+" questions.";return}
+    if(bons===p.quiz.length){E.ok=true;E.date=new Date().toISOString().slice(0,10);sauver();sc.textContent="3 sur 3 : leçon validée !";toast("Leçon de philosophie validée")}
+    else sc.textContent=bons+" sur 3. Relisez l'explication et changez vos réponses."};
+}
+
+/* ---------- L'horizon : tout ce que l'IA peut faire pour vous ---------- */
+var HORIZON=[
+ {id:"papiers",t:"Papiers et démarches",d:"Courriers, formulaires, droits, réclamations.",x:[
+  ["Comprendre une lettre officielle","Voici une lettre que j'ai reçue (je recopie le texte sans mes coordonnées) : [TEXTE]. Explique-moi en mots simples ce qu'on me demande, ce que je dois faire et avant quelle date.","lechat"],
+  ["Contester une facture","Aide-moi à écrire une réclamation polie mais ferme pour contester cette facture : [SITUATION]. Laisse [NOM] et [NUMÉRO CLIENT] à remplir.","lechat"],
+  ["Connaître mes droits","Quelles aides ou quels droits existent en France pour cette situation : [SITUATION] ? Donne les sources officielles (service-public.fr).","perplexity"],
+  ["Remplir un formulaire","Je dois remplir ce formulaire : [NOM DU FORMULAIRE]. Explique-moi chaque case, une par une, avec un exemple.","chatgpt"],
+  ["Préparer un rendez-vous administratif","J'ai rendez-vous à [ORGANISME] pour [MOTIF]. Fais-moi la liste des papiers à apporter et des questions à poser.","copilot"],
+  ["Résilier un abonnement","Écris une lettre de résiliation pour [ABONNEMENT], en citant la loi applicable si elle existe. Laisse mes coordonnées à remplir.","lechat"]]},
+ {id:"organisation",t:"Organisation et mémoire",d:"Agenda, listes, rappels, projets.",x:[
+  ["Planifier ma semaine","Voici mes rendez-vous et envies de la semaine : [LISTE]. Propose un planning équilibré sous forme de tableau, avec des pauses.","chatgpt"],
+  ["Ranger un projet en étapes","Mon projet : [PROJET]. Découpe-le en étapes simples avec une date conseillée pour chacune.","claude"],
+  ["Préparer un déménagement","Je déménage le [DATE]. Fais un rétroplanning semaine par semaine avec toutes les démarches à prévoir.","chatgpt"],
+  ["Organiser une fête de famille","J'organise [ÉVÉNEMENT] pour [NOMBRE] personnes. Fais la liste de tout ce qu'il faut prévoir, avec un calendrier.","lechat"],
+  ["Trier mes priorités","Voici tout ce que j'ai à faire : [LISTE]. Classe-le en urgent/important avec la méthode d'Eisenhower et explique pourquoi.","claude"],
+  ["Créer une routine","Aide-moi à créer une routine du matin réaliste pour [OBJECTIF], en commençant tout petit.","chatgpt"]]},
+ {id:"argent",t:"Budget et consommation",d:"Dépenses, économies, achats malins.",x:[
+  ["Faire un budget mensuel","Mes revenus : [MONTANT]. Mes dépenses fixes : [LISTE]. Propose un budget simple par enveloppes, en tableau.","chatgpt"],
+  ["Comparer deux offres","Compare ces deux offres (internet, assurance, énergie…) : [OFFRE 1] et [OFFRE 2]. Quels pièges vérifier ?","perplexity"],
+  ["Repérer les abonnements inutiles","Voici mes abonnements : [LISTE]. Lesquels pourrais-je supprimer ou regrouper ? Pose-moi des questions avant de conclure.","claude"],
+  ["Bien choisir un appareil","Je cherche [APPAREIL] pour [USAGE], budget [MONTANT]. Quels critères regarder ? Donne des sources de tests indépendants.","perplexity"],
+  ["Comprendre un contrat","Explique-moi ce contrat en mots simples et liste les points qui pourraient me coûter de l'argent : [TEXTE SANS DONNÉES PERSO].","lechat"],
+  ["Repérer une arnaque","J'ai reçu ce message : [MESSAGE]. Est-ce une arnaque ? Quels indices ? Que dois-je faire ?","copilot"]]},
+ {id:"maison",t:"Maison et bricolage",d:"Entretien, réparations, rangement, énergie.",x:[
+  ["Réparer une panne","Mon [APPAREIL] fait [SYMPTÔME]. Quelles vérifications simples et sans danger puis-je faire avant d'appeler un réparateur ?","chatgpt"],
+  ["Identifier un objet par photo","(Joignez une photo) Qu'est-ce que c'est, à quoi ça sert, et comment l'entretenir ?","gemini"],
+  ["Réduire ma facture d'énergie","Je vis dans [LOGEMENT], chauffage [TYPE]. Donne-moi 10 gestes classés du plus efficace au moins efficace.","lechat"],
+  ["Planifier des travaux","Je veux [TRAVAUX]. Liste les étapes, les artisans à contacter, les aides possibles (MaPrimeRénov'…) avec sources.","perplexity"],
+  ["Désencombrer","Aide-moi à désencombrer [PIÈCE] en 7 jours, 15 minutes par jour, avec un programme précis.","chatgpt"],
+  ["Calendrier d'entretien","Fais-moi un calendrier d'entretien de la maison mois par mois (chaudière, gouttières, détecteurs…).","claude"]]},
+ {id:"cuisine",t:"Cuisine et alimentation",d:"Menus, recettes, restes, régimes.",x:[
+  ["Cuisiner avec ce que j'ai","J'ai dans mon frigo : [INGRÉDIENTS]. Propose 3 recettes simples, sans courses.","chatgpt"],
+  ["Menus de la semaine","Fais les menus de la semaine pour [NOMBRE] personnes, budget [MONTANT], avec la liste de courses rangée par rayon.","lechat"],
+  ["Adapter une recette","Adapte cette recette pour [CONTRAINTE : sans gluten, moins de sucre, 8 personnes…] : [RECETTE].","chatgpt"],
+  ["Retrouver une recette de famille","Ma grand-mère faisait un plat qui ressemblait à [DESCRIPTION], région [RÉGION]. Qu'est-ce que ça pourrait être ? Propose la recette traditionnelle.","claude"],
+  ["Accords mets et vins","Je sers [PLAT]. Quels vins ou boissons sans alcool l'accompagneraient bien, à petit prix ?","lechat"],
+  ["Créer un livre de recettes","Aide-moi à mettre en forme mes recettes en un joli livret, avec une introduction et un sommaire : [RECETTES].","claude"]]},
+ {id:"sante",t:"Santé et bien-être (sans diagnostic)",d:"Préparer, comprendre, bouger. Jamais remplacer le médecin.",x:[
+  ["Préparer une consultation","J'ai rendez-vous chez [MÉDECIN] pour [MOTIF]. Aide-moi à préparer la liste de mes questions et de ce que je dois dire. Ne pose aucun diagnostic.","lechat"],
+  ["Comprendre un mot médical","Que veut dire [MOT] ? Explique simplement, sans diagnostic, et dis-moi quelle question poser à mon médecin.","claude"],
+  ["Programme de marche douce","Propose un programme de marche progressif sur 4 semaines pour une personne de [ÂGE] qui reprend doucement. Rappelle de demander l'avis du médecin.","chatgpt"],
+  ["Mieux dormir","Quels conseils simples et reconnus pour mieux dormir ? Cite des sources fiables (Inserm, Assurance maladie).","perplexity"],
+  ["Organiser ses médicaments","Aide-moi à faire un tableau clair de prise de mes traitements (je recopie l'ordonnance sans mon nom) : [ORDONNANCE].","lechat"],
+  ["Respirer, se détendre","Guide-moi pas à pas dans un exercice de respiration de 5 minutes pour me détendre.","claude"]]},
+ {id:"voyages",t:"Voyages et sorties",d:"Itinéraires, langues, culture locale.",x:[
+  ["Itinéraire sur mesure","Propose [NOMBRE] jours à [DESTINATION], rythme tranquille, avec un budget estimé et les formalités à vérifier.","gemini"],
+  ["Apprendre les phrases utiles","Donne-moi les 20 phrases les plus utiles en [LANGUE] pour un voyage, avec la prononciation à la française.","chatgpt"],
+  ["Comprendre une culture","Quelles coutumes et règles de politesse connaître avant d'aller à [PAYS] ?","claude"],
+  ["Sorties près de chez moi","Que faire ce week-end près de [VILLE] pour [PUBLIC] ? Donne les sources et horaires à vérifier.","perplexity"],
+  ["Voyager sans voiture","Comment aller de [DÉPART] à [ARRIVÉE] en train ou car, le plus simplement possible ?","gemini"],
+  ["Traduire un menu ou un panneau","(Joignez une photo) Traduis ce texte et explique les plats ou les consignes.","gemini"]]},
+ {id:"apprendre",t:"Apprendre toute sa vie",d:"Langues, histoire, sciences, curiosité.",x:[
+  ["Apprendre une langue","Sois mon professeur d'[LANGUE], niveau débutant. Fais-moi une leçon de 10 minutes, puis interroge-moi.","chatgpt"],
+  ["Comprendre l'actualité","Explique-moi simplement [SUJET D'ACTUALITÉ] : le contexte, les points de vue, les sources.","perplexity"],
+  ["Revisiter l'histoire","Raconte-moi [ÉVÉNEMENT HISTORIQUE] comme un bon conteur, puis donne 3 livres pour aller plus loin.","claude"],
+  ["Comprendre la science","Explique [PHÉNOMÈNE] à quelqu'un qui n'a pas fait d'études scientifiques, avec une image de la vie quotidienne.","claude"],
+  ["Lire un classique","Je veux lire [LIVRE]. Donne-moi le contexte, les personnages et ce qu'il faut remarquer, sans dévoiler la fin.","claude"],
+  ["Réviser avec un quiz","Fais-moi un quiz de 10 questions sur [SUJET], une à la fois, et corrige-moi avec explications.","chatgpt"]]},
+ {id:"numerique",t:"Ordinateur, téléphone, tablette",d:"Dépanner, sécuriser, mieux s'en servir.",x:[
+  ["Dépanner mon ordinateur","Sous Windows 11, [PROBLÈME]. Guide-moi pas à pas, une étape à la fois, en attendant ma réponse.","copilot"],
+  ["Sécuriser mes comptes","Explique-moi comment créer de bons mots de passe et activer la double authentification, pas à pas.","copilot"],
+  ["Faire une sauvegarde","Comment sauvegarder mes photos de mon [TÉLÉPHONE / ORDINATEUR] simplement et gratuitement ?","gemini"],
+  ["Libérer de la place","Mon téléphone [MODÈLE] est plein. Comment libérer de la place sans perdre mes photos ?","gemini"],
+  ["Comprendre un message d'erreur","J'ai ce message d'erreur : [MESSAGE]. Que veut-il dire et que faire ?","copilot"],
+  ["Découvrir une appli","Explique-moi à quoi sert [APPLICATION] et les 5 choses à savoir pour bien commencer.","chatgpt"]]},
+ {id:"ecrire",t:"Écrire et créer",d:"Livres, blogs, souvenirs, poèmes, discours.",x:[
+  ["Écrire mes souvenirs","Aide-moi à écrire mes mémoires : pose-moi une question à la fois sur mon enfance, puis mets mes réponses en forme.","claude"],
+  ["Un discours pour une occasion","Écris un discours de 3 minutes pour [OCCASION], ton [ÉMOUVANT/DRÔLE], avec ces souvenirs : [SOUVENIRS].","claude"],
+  ["Un poème personnalisé","Écris un poème pour [PERSONNE] à l'occasion de [ÉVÉNEMENT], en rimes simples.","chatgpt"],
+  ["Une histoire pour mes petits-enfants","Invente une histoire du soir de 5 minutes avec [PRÉNOMS] et [ANIMAL PRÉFÉRÉ] comme héros.","chatgpt"],
+  ["Lancer un blog","Je veux créer un blog sur [PASSION]. Propose un nom, 10 idées d'articles et la plateforme gratuite la plus simple.","lechat"],
+  ["Relire et améliorer un texte","Relis ce texte, corrige l'orthographe et propose une version plus fluide sans changer mon style : [TEXTE].","claude"]]},
+ {id:"images",t:"Images, musique, vidéo",d:"Cartes, affiches, chansons, montages.",x:[
+  ["Une carte d'invitation","Crée une image pour une invitation à [ÉVÉNEMENT], style [STYLE], couleurs [COULEURS], sans texte.","copilot"],
+  ["Restaurer l'ambiance d'une vieille photo","Décris-moi comment coloriser ou restaurer une vieille photo gratuitement, pas à pas.","gemini"],
+  ["Une chanson d'anniversaire","Écris une chanson joyeuse pour l'anniversaire de [PRÉNOM] qui aime [PASSIONS], puis donne un style à coller dans Suno.","chatgpt"],
+  ["Une affiche d'association","Crée une affiche pour [ÉVÉNEMENT] le [DATE] à [LIEU], style festif et lisible.","lechat"],
+  ["Un diaporama souvenir","Aide-moi à organiser un diaporama de [ÉVÉNEMENT] : ordre des photos, titres, musique libre de droits.","claude"],
+  ["Une illustration de livre","Crée une illustration à l'aquarelle pour cette scène : [SCÈNE].","leonardo"]]},
+ {id:"passions",t:"Passions et loisirs",d:"Généalogie, jardin, photo, patrimoine, collections.",x:[
+  ["Généalogie","Mon ancêtre [NOM] est né vers [ANNÉE] à [LIEU]. Quelles archives consulter et comment chercher, étape par étape ?","perplexity"],
+  ["Histoire de ma ville","Raconte l'histoire de [VILLE] et ses lieux méconnus, avec les sources.","perplexity"],
+  ["Mon jardin","J'ai un jardin [ORIENTATION] à [RÉGION], sol [TYPE]. Que planter ce mois-ci ?","gemini"],
+  ["Identifier une plante","(Joignez une photo) Quelle est cette plante, est-elle toxique pour les animaux, comment l'entretenir ?","gemini"],
+  ["Progresser en photo","Explique-moi la règle des tiers et 5 astuces pour de plus belles photos avec mon téléphone.","chatgpt"],
+  ["Estimer une collection","Comment connaître la valeur de mes [OBJETS DE COLLECTION] ? Quels sites et quels pièges ?","perplexity"]]},
+ {id:"liens",t:"Famille et liens humains",d:"Écrire, réconcilier, transmettre, accompagner.",x:[
+  ["Un message délicat","Aide-moi à écrire un message à [PERSONNE] pour [SITUATION DÉLICATE], avec douceur et sincérité.","claude"],
+  ["Des condoléances","Aide-moi à écrire un mot de condoléances sincère et sobre pour [PERSONNE].","claude"],
+  ["Jeux en famille","Propose 10 jeux sans écran pour une après-midi avec des enfants de [ÂGES].","chatgpt"],
+  ["Accompagner un proche âgé","Mon parent [SITUATION]. Quelles aides existent en France et à qui m'adresser ? Donne les sources.","perplexity"],
+  ["Transmettre une recette ou un savoir","Aide-moi à transformer ce savoir-faire en fiche claire pour mes enfants : [SAVOIR-FAIRE].","lechat"],
+  ["Rompre la solitude","Quelles activités, associations ou bénévolat près de [VILLE] pour rencontrer du monde ?","perplexity"]]},
+ {id:"accessibilite",t:"Vue, ouïe, mobilité",d:"Lire, entendre, comprendre plus facilement.",x:[
+  ["Lire un document à voix haute","Comment faire lire à voix haute un texte ou un PDF sur mon [ORDINATEUR / TÉLÉPHONE] ?","copilot"],
+  ["Agrandir et simplifier","Réécris ce texte en gros points simples, faciles à lire : [TEXTE].","claude"],
+  ["Décrire une image","(Joignez une photo) Décris-moi cette image en détail.","chatgpt"],
+  ["Dicter au lieu d'écrire","Comment dicter mes messages au lieu de les taper sur [APPAREIL] ?","gemini"],
+  ["Sous-titres et transcription","Comment avoir des sous-titres automatiques pour mes appels vidéo ou vidéos ?","copilot"],
+  ["Facile à lire et à comprendre","Réécris ce courrier en « facile à lire et à comprendre » (FALC) : [TEXTE].","lechat"]]},
+ {id:"engagement",t:"Association et bénévolat",d:"Comptes rendus, communication, projets collectifs.",x:[
+  ["Compte rendu de réunion","Transforme mes notes de réunion en compte rendu clair avec décisions et tâches : [NOTES].","claude"],
+  ["Demande de subvention","Aide-moi à rédiger une demande de subvention pour [PROJET] de notre association.","claude"],
+  ["Publication pour les réseaux","Écris 3 versions d'une publication Facebook pour annoncer [ÉVÉNEMENT].","chatgpt"],
+  ["Recruter des bénévoles","Rédige une annonce chaleureuse pour trouver des bénévoles pour [MISSION].","lechat"],
+  ["Animer un atelier","Prépare le déroulé d'un atelier de 1 h sur [THÈME] pour [PUBLIC].","chatgpt"],
+  ["Lettre d'information","Rédige la lettre d'information trimestrielle de l'association avec ces nouvelles : [NOUVELLES].","lechat"]]},
+ {id:"entreprendre",t:"Créer une activité",d:"Idée, nom, site, clients, ventes.",x:[
+  ["Tester une idée","Mon idée : [IDÉE]. Joue l'avocat du diable : quelles questions poser avant de me lancer ?","claude"],
+  ["Trouver un nom","Propose 15 noms pour [ACTIVITÉ], faciles à retenir, et vérifie les pièges (marque, nom de domaine).","chatgpt"],
+  ["Créer une petite application","Je suis débutante. Crée-moi une application simple dans un seul fichier HTML pour [BESOIN], et explique comment l'ouvrir.","claude"],
+  ["Fiche produit","Écris une fiche produit attrayante pour [PRODUIT] vendu sur [ETSY / SITE].","chatgpt"],
+  ["Statut et démarches","Quel statut choisir en France pour [ACTIVITÉ] (micro-entreprise…) ? Sources officielles.","perplexity"],
+  ["Calculer un prix","Aide-moi à calculer le prix de vente de [PRODUIT] : coûts [COÛTS], temps [TEMPS]. Explique la méthode.","claude"]]}
+];
+function nbIdees(){return Object.keys(S.idees||{}).length}
+function vHorizon(){
+  var total=HORIZON.reduce(function(a,d){return a+d.x.length},0);
+  return '<section class="stack"><div class="stack" style="gap:6px"><span class="eyebrow">Ouvrir l\'horizon</span><h3>'+total+' choses que l\'IA peut faire pour vous</h3><p class="doux">'+HORIZON.length+' domaines de la vie. Ouvrez-en un, choisissez une idée : Alfred copie la demande, vous remplacez les [MOTS EN CROCHETS] par votre situation. '+nbIdees()+' idée'+(nbIdees()>1?'s':'')+' essayée'+(nbIdees()>1?'s':'')+'.</p></div>'+
+   '<div class="stack" style="gap:10px">'+HORIZON.map(function(d){var n=d.x.filter(function(x,k){return S.idees[d.id+"-"+k]}).length;
+     return '<details class="feuille domaine"><summary><span class="stack" style="gap:2px;display:inline-flex;vertical-align:top"><strong>'+esc(d.t)+'</strong><span class="doux petit" style="font-weight:400">'+esc(d.d)+(n?' · '+n+' essayée'+(n>1?'s':''):'')+'</span></span></summary>'+
+      '<div class="idees-liste">'+d.x.map(function(x,k){var a=byId[x[2]];var fait=S.idees[d.id+"-"+k];
+        return '<div class="idee"><div class="stack" style="gap:4px;min-width:0"><strong>'+(fait?'✓ ':'')+esc(x[0])+'</strong><span class="doux petit">'+esc(x[1])+'</span></div><a class="btn sec" href="'+lienIA(a,x[1])+'" target="_blank" rel="noopener" data-essai="'+a.id+'" data-idee-h="'+d.id+'-'+k+'">Essayer avec '+esc(a.nom)+'</a></div>'}).join("")+'</div></details>'}).join("")+'</div>'+
+   '<p class="doux petit">Pour la santé, le droit et l\'argent, l\'IA aide à préparer et à comprendre. La décision revient toujours à vous et aux professionnels.</p></section>';
+}
+
+/* ---------- Navigation ---------- */
+function route(){
+  var h=(location.hash||"#accueil").slice(1),onglet=h;
+  var m=/^lecon-(\d+)$/.exec(h);
+  var mo=/^outil-([a-z]+)$/.exec(h);
+  if(m){onglet="parcours";vLecon(+m[1]-1)}
+  else if(mo){onglet="reflechir";vOutil(mo[1])}
+  else if(/^philo-\d+$/.test(h)){onglet="reflechir";vPhilo(+h.slice(6)-1)}
+  else if(h==="reflechir")vReflechir();
+  else if(h==="guide")vGuide();
+  else if(h==="orienter")vOrienter();
+  else if(h==="parcours")vParcours();
+  else if(h==="progression")vProgression();
+  else{onglet="accueil";vAccueil()}
+  document.querySelectorAll("nav.onglets a").forEach(function(a){if(a.dataset.v===onglet)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+}
+window.addEventListener("hashchange",function(){route();window.scrollTo(0,0)});
+
+vue.addEventListener("click",function(ev){
+  var t=ev.target.closest("[data-essai]");if(t){essai(t.dataset.essai)}
+  var f=ev.target.closest("[data-f]");if(f){filtre=f.dataset.f;vGuide()}
+  var ih=ev.target.closest("[data-idee-h]");if(ih){var pr=ih.dataset.ideeH.split("-");var dom=HORIZON.filter(function(x){return x.id===pr[0]})[0];copier(dom.x[+pr[1]][1]);S.idees[ih.dataset.ideeH]=true;sauver();var st=ih.parentNode.querySelector("strong");if(st&&st.textContent.indexOf("✓")!==0)st.textContent="✓ "+st.textContent}
+  var idee=ev.target.closest("[data-idee]");if(idee){document.getElementById("besoin").value=idee.dataset.idee}
+});
+vue.addEventListener("submit",function(ev){
+  if(ev.target.id==="form-o"){ev.preventDefault();var t=document.getElementById("besoin").value.trim();
+    if(!t){toast("Écrivez d'abord votre besoin");return}
+    derniere={txt:t,perso:document.getElementById("perso").checked,eu:document.getElementById("eu").checked};
+    afficherReco();document.getElementById("resultat").scrollIntoView({behavior:"smooth",block:"start"})}
+});
+route();
+})();
+</script>
+
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}</script>
+</body>
+</html>
