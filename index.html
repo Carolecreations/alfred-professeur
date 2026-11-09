@@ -188,6 +188,9 @@ select{border:1.5px solid var(--trait);border-radius:8px;padding:8px 10px;backgr
 .idee{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--trait)}
 .idee:last-child{border-bottom:0}
 @media (max-width:560px){.idee{grid-template-columns:1fr}.idee .btn{justify-self:start}}
+.petits-ia{display:flex;flex-wrap:wrap;gap:8px}
+.petit-ia{display:inline-flex;align-items:center;min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--encre);color:var(--encre);background:var(--encre-doux);font-weight:700;font-size:.92rem;text-decoration:none}
+.petit-ia:hover{background:var(--encre);color:var(--feuille)}
 footer{margin-top:36px;padding-block:18px;border-top:1px solid var(--trait);font-size:.86rem;color:var(--texte-doux)}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--texte);color:var(--papier);padding:10px 18px;border-radius:999px;font-weight:700;z-index:30}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -363,6 +366,7 @@ var BESOINS=[
 var GENERAL={id:"general",titre:"Besoin général",ia:[["chatgpt","Le plus polyvalent pour commencer."],["lechat","Européen, bon en français."],["claude","Très bon pour écrire et réfléchir."]],temps:"5 min",cplx:"Facile",lecon:1,
   modele:"{besoin}\nRéponds en français avec des mots simples. Si tu as besoin de précisions, pose-moi d'abord des questions."};
 var PROF="Agis comme un professeur de philosophie d'université, bienveillant et exigeant, qui parle simplement.\nUtilise la méthode de Socrate : ne me donne pas ta réponse. Pose-moi une seule question à la fois, attends ma réponse, puis aide-moi à préciser mes mots, à repérer mes présupposés et mes contradictions, et à envisager le point de vue contraire.\nQuand c'est utile, cite un philosophe (Socrate, Épictète, Sénèque, Montaigne, Descartes, Pascal, Spinoza, Kant…) et explique sa pensée en deux phrases, sans jargon.\nÀ la fin, résume en 3 points ce que j'ai clarifié.\nTu n'es ni psychologue, ni médecin, ni avocat : si je parle de détresse, de violence ou d'idées de mort, arrête l'exercice et conseille-moi d'appeler le 3114 ou une personne de confiance.\n\nMon sujet : ";
+var AUTRES_IA=["chatgpt","lechat","claude","copilot","gemini","perplexity"];
 var IDEES=["Écrire à ma banque pour contester des frais","Créer une carte d'anniversaire pour ma petite-fille","Comprendre une lettre des impôts","Préparer 4 jours à Lisbonne en mai","Faire mes menus de la semaine","Créer une application pour noter mes recettes"];
 
 /* ---------- Parcours ---------- */
@@ -554,7 +558,8 @@ function vLecon(i){
   var contenu="";
   if(e===0)contenu='<p>'+esc(l.comprendre)+'</p>';
   if(e===1)contenu='<p class="doux">Voici un exemple de demande, et le genre de réponse obtenue :</p><div class="demande">'+esc(l.observer.q)+'</div><div class="feuille" style="background:var(--papier)"><span class="eyebrow">Réponse de l\'IA (exemple)</span><p style="white-space:pre-wrap;margin-top:6px">'+esc(l.observer.r)+'</p></div>';
-  if(e===2)contenu='<p>À vous ! Copiez cette demande, ouvrez '+esc(ia.nom)+' (ou l\'IA de votre choix) et collez-la. Lisez la réponse, puis revenez ici.</p><div class="demande">'+esc(l.pratiquer)+'</div><div class="row"><a class="btn" href="'+lienIA(ia,l.pratiquer)+'" target="_blank" rel="noopener" data-essai="'+ia.id+'" data-copie-l="1">Copier et ouvrir '+esc(ia.nom)+'</a><a class="btn sec" href="#orienter">Choisir une autre IA</a></div>';
+  if(e===2)contenu='<p>À vous ! Copiez cette demande, ouvrez '+esc(ia.nom)+' (ou l\'IA de votre choix) et collez-la. Lisez la réponse, puis revenez ici.</p><div class="demande">'+esc(l.pratiquer)+'</div><div class="row"><a class="btn" href="'+lienIA(ia,l.pratiquer)+'" target="_blank" rel="noopener" data-essai="'+ia.id+'" data-copie-l="1">Copier et ouvrir '+esc(ia.nom)+'</a></div>'+
+   '<div class="stack" style="gap:8px"><span class="doux petit">Ou essayez la même demande avec une autre IA :</span><div class="petits-ia">'+AUTRES_IA.filter(function(id){return id!==ia.id}).map(function(id){var a=byId[id];return'<a class="petit-ia" href="'+lienIA(a,l.pratiquer)+'" target="_blank" rel="noopener" data-essai="'+id+'" data-copie-l="1">'+esc(a.nom)+'</a>'}).join("")+'</div><span class="doux petit">Comparer deux IA sur la même demande, c\'est le meilleur moyen de trouver celle qui vous convient.</span></div>';
   if(e===3)contenu='<form class="quiz" id="quiz">'+l.quiz.map(function(q,qi){return'<fieldset><legend>'+(qi+1)+'. '+esc(q[0])+'</legend>'+q[1].map(function(o,oi){return'<label><input type="radio" name="q'+qi+'" value="'+oi+'"> '+esc(o)+'</label>'}).join("")+'<p class="expl" hidden>'+esc(q[3])+'</p></fieldset>'}).join("")+'<button class="btn" type="submit">Vérifier mes réponses</button><p id="score" class="doux" style="margin-top:10px"></p></form>';
   if(e===4){var ok=S.lecons[i]&&S.lecons[i].ok;
     contenu='<p>Vous avez réussi l\'évaluation. Une dernière question pour estimer le temps que l\'IA vous fait gagner :</p>'+
@@ -576,7 +581,7 @@ function vLecon(i){
   var suite=document.getElementById("suite");
   if(suite)suite.onclick=function(){S.etape[i]=e+1;sauver();vLecon(i);window.scrollTo(0,0)};
   vue.querySelectorAll("[data-etape]").forEach(function(b){b.onclick=function(){var k=+b.dataset.etape;S.etape[i]=k;sauver();vLecon(i)}});
-  var lc=vue.querySelector("[data-copie-l]");if(lc)lc.addEventListener("click",function(){copier(l.pratiquer)});
+  vue.querySelectorAll("[data-copie-l]").forEach(function(lc){lc.addEventListener("click",function(){copier(l.pratiquer)})});
   var qz=document.getElementById("quiz");
   if(qz)qz.onsubmit=function(ev){ev.preventDefault();var bons=0,rep=0;
     l.quiz.forEach(function(q,qi){var fs=qz.querySelectorAll("fieldset")[qi];var c=fs.querySelector("input:checked");
@@ -660,7 +665,7 @@ function boutonsProf(sujet){var txt=PROF+sujet;
   return '<div class="feuille cahier stack"><span class="eyebrow">Approfondir avec un professeur de philosophie</span>'+
    '<p class="doux">Alfred prépare une demande qui fait jouer à l\'IA le rôle d\'un professeur de philosophie d\'université : il vous interroge au lieu de répondre à votre place.</p>'+
    '<details><summary>Voir la demande</summary><div class="demande" style="margin-top:8px">'+esc(txt)+'</div></details>'+
-   '<div class="row">'+["claude","lechat","chatgpt"].map(function(id,k){var a=byId[id];return'<a class="btn'+(k?' sec':'')+'" href="'+lienIA(a,txt)+'" target="_blank" rel="noopener" data-essai="'+id+'" data-prof="1">Ouvrir '+esc(a.nom)+'</a>'}).join("")+'</div>'+
+   '<div class="row">'+["claude","lechat","chatgpt","gemini","copilot"].map(function(id,k){var a=byId[id];return'<a class="btn'+(k?' sec':'')+'" href="'+lienIA(a,txt)+'" target="_blank" rel="noopener" data-essai="'+id+'" data-prof="1">Ouvrir '+esc(a.nom)+'</a>'}).join("")+'</div>'+
    '<p class="doux petit">La demande est copiée en même temps : collez-la si la page de l\'IA s\'ouvre vide. Pour un sujet intime, préférez Le Chat (européen).</p></div>';
 }
 function vReflechir(){
@@ -860,7 +865,7 @@ function vPhilo(i){
    '<section class="feuille stack"><h3>L\'objection</h3><p>'+esc(p.objection)+'</p><h3>Et aujourd\'hui ?</h3><p>'+esc(p.aujourdhui)+'</p></section>'+
    '<section class="feuille cahier stack"><h3>À vous de réfléchir</h3><div class="question"><label for="px">'+esc(p.exercice)+'</label><textarea id="px">'+esc(E.rep||"")+'</textarea></div><div><button class="btn sec" type="button" id="px-ok">Enregistrer ma réflexion</button></div></section>'+
    '<section class="feuille stack"><h3>Vérifier ce que j\'ai compris</h3><form class="quiz" id="quiz">'+p.quiz.map(function(q,qi){return'<fieldset><legend>'+(qi+1)+'. '+esc(q[0])+'</legend>'+q[1].map(function(o,oi){return'<label><input type="radio" name="q'+qi+'" value="'+oi+'"> '+esc(o)+'</label>'}).join("")+'<p class="expl" hidden>'+esc(q[3])+'</p></fieldset>'}).join("")+'<button class="btn" type="submit">Vérifier mes réponses</button><p id="score" class="doux" style="margin-top:10px">'+(E.ok?'Leçon déjà validée.':'')+'</p></form></section>'+
-   '<div class="feuille cahier stack"><span class="eyebrow">Aller plus loin avec un professeur</span><p class="doux">Alfred prépare une demande pour que l\'IA vous fasse un vrai cours sur ce texte, puis vous interroge.</p><details><summary>Voir la demande</summary><div class="demande" style="margin-top:8px">'+esc(demande)+'</div></details><div class="row">'+["claude","lechat","chatgpt"].map(function(id,k){var a=byId[id];return'<a class="btn'+(k?' sec':'')+'" href="'+lienIA(a,demande)+'" target="_blank" rel="noopener" data-essai="'+id+'" data-pcopie="1">Ouvrir '+esc(a.nom)+'</a>'}).join("")+'</div></div>'+
+   '<div class="feuille cahier stack"><span class="eyebrow">Aller plus loin avec un professeur</span><p class="doux">Alfred prépare une demande pour que l\'IA vous fasse un vrai cours sur ce texte, puis vous interroge.</p><details><summary>Voir la demande</summary><div class="demande" style="margin-top:8px">'+esc(demande)+'</div></details><div class="row">'+["claude","lechat","chatgpt","gemini","copilot"].map(function(id,k){var a=byId[id];return'<a class="btn'+(k?' sec':'')+'" href="'+lienIA(a,demande)+'" target="_blank" rel="noopener" data-essai="'+id+'" data-pcopie="1">Ouvrir '+esc(a.nom)+'</a>'}).join("")+'</div></div>'+
    '<div class="row">'+(i>0?'<a class="btn sec" href="#philo-'+i+'">← '+esc(PHILO[i-1].a)+'</a>':'')+(i<PHILO.length-1?'<a class="btn sec" href="#philo-'+(i+2)+'">'+esc(PHILO[i+1].a)+' →</a>':'')+'</div></div>';
   document.getElementById("px-ok").onclick=function(){var t=document.getElementById("px").value;if(detresse(t)){vCrise();return}E.rep=t;sauver();toast("Réflexion enregistrée")};
   vue.querySelectorAll("[data-pcopie]").forEach(function(l){l.addEventListener("click",function(){copier(demande)})});
