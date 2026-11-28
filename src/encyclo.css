@@ -1,0 +1,34 @@
+/* Encyclopédie */
+.visuel-cache{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.enc-form{display:flex;gap:8px;position:sticky;bottom:12px;z-index:5;background:var(--papier);padding:8px;border:1.5px solid var(--encre);border-radius:999px;box-shadow:0 6px 18px rgba(20,30,70,.12)}
+.enc-form input{flex:1;min-width:0;border:0;background:transparent;padding:8px 12px;font-size:1rem}
+.enc-form input:focus{outline:none}
+@media (max-width:640px){.enc-form{bottom:calc(74px + env(safe-area-inset-bottom,0px))}.enc-form .btn{padding:8px 14px}}
+.bulle-q{display:flex;justify-content:flex-end}
+.bulle-q span{background:var(--encre);color:var(--feuille);padding:10px 16px;border-radius:18px 18px 4px 18px;max-width:85%;font-weight:700;overflow-wrap:anywhere}
+.bulle-r{background:var(--feuille);border:1px solid var(--trait);border-radius:4px 18px 18px 18px;padding:18px;min-width:0}
+.bulle-r h3,.feuille h2{color:var(--encre)}
+.enc-r{font-family:var(--f-titre);font-size:1.12rem;font-weight:500;line-height:1.4}
+.bulle-r h4,.feuille h4{font-family:var(--f-titre);font-size:1rem;margin:6px 0 0;color:var(--encre)}
+.enc-liste{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.enc-cit{margin:0;padding:10px 14px;border-left:4px solid var(--marge);background:var(--papier);border-radius:0 8px 8px 0;font-family:var(--f-titre);font-size:1.05rem}
+.enc-cit cite{display:block;margin-top:4px;font-family:var(--f-texte);font-style:normal;font-size:.84rem;color:var(--texte-doux)}
+.enc-plus summary,.enc-ia summary{padding:6px 0}
+.enc-ia{border-top:1px dashed var(--trait);padding-top:6px}
+.enc-ia summary{color:var(--texte-doux);font-size:.92rem}
+.enc-suite{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.enc-suite .chip{font-size:.86rem;text-decoration:none;text-align:left}
+.enc-comp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.enc-comp{grid-template-columns:1fr}}
+.enc-col{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid var(--trait);border-radius:var(--r);background:var(--papier);min-width:0}
+.garde-psy{font-size:.86rem;color:var(--texte-doux);border-left:3px solid var(--ambre);padding:4px 10px;background:var(--ambre-doux);border-radius:0 6px 6px 0}
+.enc-filtre{width:100%;border:1.5px solid var(--trait);border-radius:999px;padding:10px 16px;background:var(--feuille)}
+.enc-index{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.enc-index a{display:block;padding:8px 12px;border:1px solid var(--trait);border-radius:8px;background:var(--feuille);text-decoration:none;color:var(--texte)}
+.enc-index a:hover{border-color:var(--encre)}
+.enc-index a.lu{border-left:4px solid var(--vert)}
+.enc-index a .petit{display:block}
+.frise{list-style:none;margin:0;padding:0 0 0 18px;border-left:3px solid var(--encre-doux);display:flex;flex-direction:column;gap:6px}
+.frise li a{display:block;text-decoration:none;color:var(--texte);padding:6px 10px;border-radius:8px}
+.frise li a:hover{background:var(--encre-doux)}
+.frise-siecle{font-family:var(--f-titre);font-weight:800;color:var(--encre);margin:12px 0 2px -30px;background:var(--papier);padding-left:6px}
