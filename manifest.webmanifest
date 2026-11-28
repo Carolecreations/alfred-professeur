@@ -1,7 +1,7 @@
 {
   "name": "Alfred Professeur",
   "short_name": "Alfred",
-  "description": "Votre professeur pour choisir et utiliser les IA gratuites, et votre professeur de philosophie.",
+  "description": "Votre encyclopédie de philosophie et de psychanalyse, et votre guide des IA gratuites.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
